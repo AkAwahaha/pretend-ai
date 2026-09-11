@@ -14,7 +14,8 @@ export function buildPrompt(item) {
     "你是 AI 产品经理的情报编辑。",
     "把一条 AI 资讯或开源项目，整理成可以直接用于面试准备的结构化卡片。",
     "要求：中文；不堆砌形容词；说清楚它解决了什么问题、亮点和实现思路在哪、产品经理应该怎么理解。",
-    "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime}。",
+    "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime}。" ,
+    "title 用中文概括，开源项目保留原始仓库名（owner/repo）。",
     "summary 不超过 50 字；what 1-2 句；highlights 2-3 句；productView 2-3 句，要落到产品判断或面试表达。",
   ].join("\n");
 
@@ -82,7 +83,7 @@ export async function summarizeItem(item, { config, postJsonImpl = postJson, ret
         throw new Error(errors.join("；"));
       }
       return {
-        title: String(item.title).trim(),
+        title: parsed.title.trim(),
         summary: parsed.summary.trim(),
         what: parsed.what.trim(),
         highlights: parsed.highlights.trim(),

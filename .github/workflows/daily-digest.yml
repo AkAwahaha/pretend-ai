@@ -1,0 +1,71 @@
+name: 每日日报生成
+
+on:
+  schedule:
+    # 每天 00:00 UTC，即北京时间 08:00
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 安装管线依赖
+        working-directory: pipeline
+        run: npm ci
+
+      - name: 管线测试
+        working-directory: pipeline
+        run: npm test
+
+      - name: 抓取并生成日报
+        working-directory: pipeline
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+        run: npm run generate
+
+      - name: 安装前端依赖
+        working-directory: web
+        run: npm ci
+
+      - name: 前端测试
+        working-directory: web
+        run: npm test
+
+      - name: 构建前端
+        working-directory: web
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
