@@ -1,0 +1,30 @@
+:root {
+  --page-bg: #f2f1f6;
+  --card-bg: #ffffff;
+  --text-primary: #17181c;
+  --text-secondary: #5b6472;
+  --text-muted: #9aa3af;
+  --card-border: #eceef2;
+  --brand: #5e6ad2;
+  --brand-tint: #edeffb;
+  --glow-coral: #ff8a65;
+  --glow-violet: #a78bfa;
+  --glow-pink: #ec4899;
+
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-display: "Inter", "Noto Sans SC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 20px;
+  --space-5: 24px;
+
+  --radius-card: 16px;
+  --radius-row: 12px;
+  --radius-tag: 6px;
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 8px 24px rgba(23, 24, 28, 0.06);
+}
