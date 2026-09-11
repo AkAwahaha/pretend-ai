@@ -3,7 +3,6 @@ import { FilterChips } from "../components/FilterChips";
 import { DeepCard } from "../components/DeepCard";
 import { GlanceRow } from "../components/GlanceRow";
 import { GlowBackground } from "../components/GlowBackground";
-import { StatusBar } from "../components/StatusBar";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
 import type { Category } from "../data/sources";
@@ -29,8 +28,7 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
 
   return (
     <div className="frame">
-      <GlowBackground watermark={!onBack} />
-      <StatusBar />
+      <GlowBackground />
       <div className="content">
         {onBack ? <TopBar title="历史日报" onBack={onBack} /> : null}
 

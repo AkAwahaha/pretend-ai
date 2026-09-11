@@ -3,7 +3,8 @@ import { DetailPage } from "./pages/DetailPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { TodayPage } from "./pages/TodayPage";
-import { ALL_ITEMS, HISTORY_DIGESTS, findDigest, findItem } from "./data/mock";
+import { ALL_ITEMS, HISTORY_DIGESTS, findDigest } from "./data/mock";
+import type { DigestItem } from "./types";
 import { useDigest } from "./hooks/useDigest";
 import { useFavorites } from "./hooks/useFavorites";
 import { useHashRoute } from "./hooks/useHashRoute";
@@ -14,13 +15,27 @@ export function App() {
   const { ids, toggle, isFavorite } = useFavorites();
   const { digest } = useDigest();
 
-  const favoriteItems = useMemo(() => ALL_ITEMS.filter((item) => ids.includes(item.id)), [ids]);
+  const itemPool = useMemo(() => {
+    const byId = new Map<string, DigestItem>();
+    for (const item of ALL_ITEMS) {
+      byId.set(item.id, item);
+    }
+    for (const item of digest.items) {
+      byId.set(item.id, item);
+    }
+    return Array.from(byId.values());
+  }, [digest]);
+
+  const favoriteItems = useMemo(
+    () => itemPool.filter((item) => ids.includes(item.id)),
+    [itemPool, ids],
+  );
 
   const goToday = () => navigate("/today");
   const openItem = (id: string) => navigate(`/item/${id}`);
 
   if (route.name === "item") {
-    const item = findItem(route.id);
+    const item = itemPool.find((entry) => entry.id === route.id);
     if (item) {
       return (
         <DetailPage

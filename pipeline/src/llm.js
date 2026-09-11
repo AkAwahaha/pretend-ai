@@ -18,7 +18,7 @@ export function buildPrompt(item) {
     "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime}。" ,
     "title 用中文概括；开源项目保留 owner/repo，其余英文标题必须翻译。",
     "readTime 用「X 分钟」格式。",
-    "summary 不超过 50 字；what 1-2 句；highlights 2-3 句；productView 2-3 句，要落到产品判断或面试表达。",
+    "summary 用 80-120 字完整说清这条内容；what 2-3 句；highlights 3-4 句，把实现思路讲透；productView 3-4 句，要落到产品判断或面试表达。",
   ].join("\n");
 
   const user = [

@@ -1,7 +1,6 @@
 import { Bookmark, ExternalLink } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
 import { SourceTag } from "../components/SourceTag";
-import { StatusBar } from "../components/StatusBar";
 import { ThreeQuestionCard } from "../components/ThreeQuestionCard";
 import { TopBar } from "../components/TopBar";
 import type { DigestItem } from "../types";
@@ -17,7 +16,6 @@ export function DetailPage({ item, favorite, onToggleFavorite, onBack }: DetailP
   return (
     <div className="frame">
       <GlowBackground />
-      <StatusBar />
       <div className="content">
         <TopBar
           onBack={onBack}
@@ -38,6 +36,10 @@ export function DetailPage({ item, favorite, onToggleFavorite, onBack }: DetailP
           <SourceTag source={item.source} label={item.sourceLabel} />
           <h1 className="detail-title">{item.title}</h1>
           <p className="detail-summary">{item.summary}</p>
+          <a className="read-original" href={item.sourceUrl} target="_blank" rel="noreferrer">
+            <ExternalLink size={15} />
+            阅读原文
+          </a>
           <ThreeQuestionCard item={item} />
           <a className="source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
             <ExternalLink size={14} />

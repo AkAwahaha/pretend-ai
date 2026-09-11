@@ -1,6 +1,5 @@
 import { GlanceRow } from "../components/GlanceRow";
 import { GlowBackground } from "../components/GlowBackground";
-import { StatusBar } from "../components/StatusBar";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
 import type { DigestItem } from "../types";
@@ -17,7 +16,6 @@ export function FavoritesPage({ items, isFavorite, onToggleFavorite, onOpen, onB
   return (
     <div className="frame">
       <GlowBackground />
-      <StatusBar />
       <div className="content">
         <TopBar title="收藏" onBack={onBack} />
 

@@ -37,65 +37,35 @@ export function rankItems(items) {
 
 export function selectItems(items, { featuredCount = 3, maxItems = 8 } = {}) {
   const ranked = rankItems(items);
-  const featured = [];
-  const usedSources = new Set();
+  const buckets = new Map();
 
   for (const item of ranked) {
-    if (featured.length >= featuredCount) {
+    const bucket = buckets.get(item.sourceKey) ?? [];
+    bucket.push(item);
+    buckets.set(item.sourceKey, bucket);
+  }
+
+  const ordered = [];
+  let round = 0;
+
+  while (ordered.length < maxItems) {
+    let added = false;
+    for (const bucket of buckets.values()) {
+      if (ordered.length >= maxItems) {
+        break;
+      }
+      if (round < bucket.length) {
+        ordered.push(bucket[round]);
+        added = true;
+      }
+    }
+    if (!added) {
       break;
     }
-    if (usedSources.has(item.sourceKey)) {
-      continue;
-    }
-    usedSources.add(item.sourceKey);
-    featured.push(item);
+    round += 1;
   }
 
-  for (const item of ranked) {
-    if (featured.length >= featuredCount) {
-      break;
-    }
-    if (!featured.includes(item)) {
-      featured.push(item);
-    }
-  }
-
-  const counts = new Map();
-  for (const item of featured) {
-    counts.set(item.sourceKey, (counts.get(item.sourceKey) ?? 0) + 1);
-  }
-
-  const rest = [];
-  const restLimit = Math.max(0, maxItems - featured.length);
-  for (const item of ranked) {
-    if (rest.length >= restLimit) {
-      break;
-    }
-    if (featured.includes(item)) {
-      continue;
-    }
-    const used = counts.get(item.sourceKey) ?? 0;
-    if (used >= 2) {
-      continue;
-    }
-    counts.set(item.sourceKey, used + 1);
-    rest.push(item);
-  }
-
-  for (const item of ranked) {
-    if (rest.length >= restLimit) {
-      break;
-    }
-    if (featured.includes(item) || rest.includes(item)) {
-      continue;
-    }
-    rest.push(item);
-  }
-
-  return [
-    ...featured.map((item) => ({ ...item, featured: true })),
-    ...rest.map((item) => ({ ...item, featured: false })),
-  ];
+  return ordered.map((item, index) => ({ ...item, featured: index < featuredCount }));
 }
 
 export async function collectRawItems({ sources = SOURCES, fetchSourceImpl = fetchSource, logger = console } = {}) {

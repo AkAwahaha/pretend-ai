@@ -1,6 +1,5 @@
 import { ChevronRight } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
-import { StatusBar } from "../components/StatusBar";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
 import type { DailyDigest } from "../types";
@@ -15,7 +14,6 @@ export function HistoryPage({ digests, onOpenDay, onBack }: HistoryPageProps) {
   return (
     <div className="frame">
       <GlowBackground />
-      <StatusBar />
       <div className="content">
         <TopBar title="历史日报" onBack={onBack} />
 
