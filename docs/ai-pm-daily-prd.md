@@ -56,7 +56,24 @@ MVP 默认五类：
 
 备选与后续扩展：TechCrunch AI、The Verge AI、MIT Technology Review、机器之心、量子位、新智元、Founder Park、海外独角兽、特工宇宙、Import AI、Ben's Bites、Lenny's Newsletter、Stanford HAI AI Index、LMArena、Hugging Face Trending。
 
-抓取说明：官方博客、GitHub、arXiv、Hugging Face 和部分媒体有 RSS 或 API，可自动抓取；公众号、小红书、抖音没有稳定接口，第一版以手动补充链接为主。
+### 已实测可用（2026-09-12 验证）
+
+- OpenAI Blog RSS：https://openai.com/news/rss.xml
+- Google DeepMind Blog RSS：https://deepmind.google/blog/rss.xml
+- TLDR AI RSS：https://tldr.tech/api/rss/ai
+- Menlo Ventures RSS：https://menlovc.com/feed/
+- GitHub Search API：https://api.github.com/search/repositories（按主题 + 近期活跃度 + star 排序）
+
+### 待接入 / 受限
+
+- Hugging Face Daily Papers API：当前网络被挡，作为可选源，在 GitHub Actions 环境重试
+- arXiv API：当前网络被挡，作为可选源
+- Anthropic News：没有公开 RSS，第一版用 HTML 抓取标题，后续再找稳定接口
+- a16z AI：feed 返回 404，后续更换路径或手动补充
+
+### 抓取说明
+
+公众号、小红书、抖音没有稳定接口，第一版以手动补充链接为主。单个来源失败不影响整体生成，管线会跳过并在日志中标注。
 
 ## MVP 范围
 
@@ -94,6 +111,17 @@ MVP 默认五类：
 - AI：付费 LLM API 做摘要、亮点提炼和产品视角生成，每天几十条内容，成本可控
 - 部署：GitHub Actions 定时生成 + Pages 托管，服务器成本为零
 - 风险：自媒体抓取不稳定、内容版权（只做摘要 + 原文链接）、AI 幻觉（保留原文链接供核对）
+
+## LLM 接入
+
+- 协议：OpenAI 兼容的 Chat Completions 接口，通过环境变量配置，不写死在代码里
+  - `LLM_API_KEY`：API 密钥
+  - `LLM_BASE_URL`：接口地址，默认 `https://api.openai.com/v1`
+  - `LLM_MODEL`：模型名，默认 `gpt-4o-mini`
+- 每条内容生成结构化卡片：`summary`、`what`、`highlights`、`productView`
+- 输出必须是 JSON，经 schema 校验；不合格自动重试，最多 2 次
+- 成本控制：每天最多 8 条、输入截断 2500 字符、按内容哈希缓存、失败时降级为标题 + 摘要
+- API Key 只放在本地 `.env` 或 GitHub Secrets，禁止提交到仓库
 
 ## 待确认
 
