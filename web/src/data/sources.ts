@@ -8,6 +8,7 @@ export const SOURCE_META: Record<SourceKey, { label: string; color: string; tint
   huggingface: { label: "Hugging Face", color: "#F59E0B", tint: "#FEF5E3" },
   tldr: { label: "TLDR AI", color: "#EC4899", tint: "#FDEAF4" },
   a16z: { label: "a16z", color: "#14B8A6", tint: "#E3F8F5" },
+  menlo: { label: "Menlo", color: "#2563EB", tint: "#E7EFFE" },
   arxiv: { label: "arXiv", color: "#EF4444", tint: "#FDECEC" },
 };
 

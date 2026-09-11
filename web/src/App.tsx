@@ -3,7 +3,8 @@ import { DetailPage } from "./pages/DetailPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { TodayPage } from "./pages/TodayPage";
-import { ALL_ITEMS, HISTORY_DIGESTS, TODAY_DIGEST, findDigest, findItem } from "./data/mock";
+import { ALL_ITEMS, HISTORY_DIGESTS, findDigest, findItem } from "./data/mock";
+import { useDigest } from "./hooks/useDigest";
 import { useFavorites } from "./hooks/useFavorites";
 import { useHashRoute } from "./hooks/useHashRoute";
 import { navigate } from "./router";
@@ -11,6 +12,7 @@ import { navigate } from "./router";
 export function App() {
   const route = useHashRoute();
   const { ids, toggle, isFavorite } = useFavorites();
+  const { digest } = useDigest();
 
   const favoriteItems = useMemo(() => ALL_ITEMS.filter((item) => ids.includes(item.id)), [ids]);
 
@@ -70,7 +72,7 @@ export function App() {
 
   return (
     <TodayPage
-      digest={TODAY_DIGEST}
+      digest={digest}
       isFavorite={isFavorite}
       onToggleFavorite={toggle}
       onOpen={openItem}

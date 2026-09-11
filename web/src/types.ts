@@ -6,6 +6,7 @@ export type SourceKey =
   | "huggingface"
   | "tldr"
   | "a16z"
+  | "menlo"
   | "arxiv";
 
 export interface DigestItem {

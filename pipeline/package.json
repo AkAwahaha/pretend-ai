@@ -1,0 +1,14 @@
+{
+  "name": "pretend-ai-pipeline",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "fetch": "node src/index.js --fetch-only",
+    "generate": "node src/index.js",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.4.1"
+  }
+}
