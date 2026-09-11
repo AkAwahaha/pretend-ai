@@ -29,6 +29,17 @@ describe("validateCard", () => {
     assert.ok(result.errors.length > 0);
   });
 
+  it("检测未翻译的整句英文", () => {
+    const result = validateCard({
+      title: "A",
+      summary: "This is a long English sentence that was not translated at all",
+      what: "C",
+      highlights: "D",
+      productView: "E",
+    });
+    assert.equal(result.ok, false);
+  });
+
   it("字段齐全时通过", () => {
     const result = validateCard({
       title: "A",
@@ -78,7 +89,7 @@ describe("summarizeItem", () => {
     });
 
     assert.equal(card.summary, "摘要");
-    assert.equal(card.readTime, "2 min");
+    assert.equal(card.readTime, "2 分钟");
   });
 });
 

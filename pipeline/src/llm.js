@@ -13,9 +13,11 @@ export function buildPrompt(item) {
   const system = [
     "你是 AI 产品经理的情报编辑。",
     "把一条 AI 资讯或开源项目，整理成可以直接用于面试准备的结构化卡片。",
-    "要求：中文；不堆砌形容词；说清楚它解决了什么问题、亮点和实现思路在哪、产品经理应该怎么理解。",
+    "要求：所有字段必须用简体中文输出；不堆砌形容词；说清楚它解决了什么问题、亮点和实现思路在哪、产品经理应该怎么理解。",
+    "英文原文必须翻译成中文；只有公司名、产品名、模型名和开源仓库名可以保留英文，且必须放在中文语境里，不得出现整句英文。",
     "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime}。" ,
-    "title 用中文概括，开源项目保留原始仓库名（owner/repo）。",
+    "title 用中文概括；开源项目保留 owner/repo，其余英文标题必须翻译。",
+    "readTime 用「X 分钟」格式。",
     "summary 不超过 50 字；what 1-2 句；highlights 2-3 句；productView 2-3 句，要落到产品判断或面试表达。",
   ].join("\n");
 
@@ -43,12 +45,30 @@ export function extractJson(text) {
   return JSON.parse(cleaned.slice(start, end + 1));
 }
 
+export function normalizeReadTime(value) {
+  const text = String(value ?? "").trim();
+  const match = text.match(/(\d+)\s*(?:min|minute|minutes|分钟)?/i);
+  if (!match) {
+    return "2 分钟";
+  }
+  return match[1] + " 分钟";
+}
+
+function hasUntranslatedEnglish(value) {
+  return /[A-Za-z][A-Za-z0-9\s,.-]{29,}/.test(String(value));
+}
+
 export function validateCard(value) {
   const errors = [];
   const fields = ["title", "summary", "what", "highlights", "productView"];
   for (const field of fields) {
     if (typeof value?.[field] !== "string" || value[field].trim().length === 0) {
       errors.push("缺少字段：" + field);
+    }
+  }
+  for (const field of ["title", "summary", "what", "highlights", "productView"]) {
+    if (typeof value?.[field] === "string" && hasUntranslatedEnglish(value[field])) {
+      errors.push("疑似未翻译的英文：" + field);
     }
   }
   return { ok: errors.length === 0, errors };
@@ -88,10 +108,7 @@ export async function summarizeItem(item, { config, postJsonImpl = postJson, ret
         what: parsed.what.trim(),
         highlights: parsed.highlights.trim(),
         productView: parsed.productView.trim(),
-        readTime:
-          typeof parsed.readTime === "string" && parsed.readTime.trim().length > 0
-            ? parsed.readTime.trim()
-            : "2 min",
+        readTime: normalizeReadTime(parsed.readTime),
       };
     } catch (error) {
       lastError = error;
@@ -109,6 +126,6 @@ export function fallbackCard(item) {
     what: raw.slice(0, 160),
     highlights: "这条内容还没完成精读，先保留原始链接，避免漏掉线索。",
     productView: "可以先记下这条线索，等更多信息出来再判断它的产品价值。",
-    readTime: "1 min",
+    readTime: "1 分钟",
   };
 }
