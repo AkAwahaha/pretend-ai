@@ -1,8 +1,8 @@
-name: 每日日报生成
+name: Daily Digest
 
 on:
   schedule:
-    # 每天 00:00 UTC，即北京时间 08:00
+    # 00:00 UTC = 08:00 Asia/Shanghai
     - cron: "0 0 * * *"
   workflow_dispatch:
 
@@ -23,17 +23,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
-      - name: 安装管线依赖
+      - name: Install pipeline dependencies
         working-directory: pipeline
         run: npm ci
 
-      - name: 管线测试
+      - name: Run pipeline tests
         working-directory: pipeline
         run: npm test
 
-      - name: 抓取并生成日报
+      - name: Generate digest
         working-directory: pipeline
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -41,15 +41,15 @@ jobs:
           LLM_MODEL: ${{ vars.LLM_MODEL }}
         run: npm run generate
 
-      - name: 安装前端依赖
+      - name: Install web dependencies
         working-directory: web
         run: npm ci
 
-      - name: 前端测试
+      - name: Run web tests
         working-directory: web
         run: npm test
 
-      - name: 构建前端
+      - name: Build web
         working-directory: web
         run: npm run build
 
@@ -68,6 +68,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: 部署到 GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
