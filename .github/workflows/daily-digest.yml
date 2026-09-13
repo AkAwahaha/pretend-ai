@@ -2,9 +2,14 @@ name: Daily Digest
 
 on:
   schedule:
-    # 00:17 UTC = 08:17 Asia/Shanghai (避开整点高峰)
-    - cron: "17 0 * * *"
+    # 每小时尝试一次（第 7 分钟），当天日报已存在时自动跳过
+    - cron: "7 * * * *"
   workflow_dispatch:
+    inputs:
+      force:
+        description: "强制重新生成当天日报并部署"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -13,27 +18,49 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      generated: ${{ steps.check.outputs.skip != 'true' }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check today's digest
+        id: check
+        run: |
+          TODAY=$(TZ=Asia/Shanghai date +%F)
+          echo "today=$TODAY" >> "$GITHUB_OUTPUT"
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "手动强制运行，忽略已有日报"
+          elif [ -f "web/public/data/archive/$TODAY.json" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "今天的日报已存在，跳过生成"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "今天还没有日报，开始生成"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.skip != 'true'
         with:
           node-version: "20"
 
       - name: Install pipeline dependencies
+        if: steps.check.outputs.skip != 'true'
         working-directory: pipeline
         run: npm ci
 
       - name: Run pipeline tests
+        if: steps.check.outputs.skip != 'true'
         working-directory: pipeline
         run: npm test
 
       - name: Generate digest
+        if: steps.check.outputs.skip != 'true'
         working-directory: pipeline
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -41,36 +68,43 @@ jobs:
           LLM_MODEL: ${{ vars.LLM_MODEL }}
         run: npm run generate
 
-      - name: Persist seen index
+      - name: Persist digest and seen index
+        if: steps.check.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pipeline/data/seen.json
-          git diff --staged --quiet || git commit -m "chore: update seen index [skip ci]"
+          git add pipeline/data/seen.json web/public/data
+          git diff --staged --quiet || git commit -m "chore: update digest [skip ci]"
           git push
 
       - name: Install web dependencies
+        if: steps.check.outputs.skip != 'true'
         working-directory: web
         run: npm ci
 
       - name: Run web tests
+        if: steps.check.outputs.skip != 'true'
         working-directory: web
         run: npm test
 
       - name: Build web
+        if: steps.check.outputs.skip != 'true'
         working-directory: web
         run: npm run build
 
       - uses: actions/configure-pages@v5
+        if: steps.check.outputs.skip != 'true'
         with:
           enablement: true
 
       - uses: actions/upload-pages-artifact@v3
+        if: steps.check.outputs.skip != 'true'
         with:
           path: web/dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.generated == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -132,10 +132,18 @@ export async function writeDigest(digest, { outDir }) {
     index = [];
   }
 
+  const entry = {
+    date: digest.date,
+    label: digest.label,
+    count: digest.items.length,
+    title: digest.items[0]?.title ?? "",
+    sources: Array.from(new Set(digest.items.map((item) => item.sourceLabel))),
+  };
+
   const next = [
-    { date: digest.date, label: digest.label },
-    ...index.filter((entry) => entry?.date !== digest.date),
-  ].slice(0, 60);
+    entry,
+    ...index.filter((item) => item?.date !== digest.date),
+  ].slice(0, 90);
 
   await writeJson(indexPath, next);
 }

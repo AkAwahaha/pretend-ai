@@ -7,6 +7,3 @@ dist/
 .DS_Store
 pipeline/.cache.json
 pipeline/.debug/
-web/public/data/latest.json
-web/public/data/index.json
-web/public/data/archive/

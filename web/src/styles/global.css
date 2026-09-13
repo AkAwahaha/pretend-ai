@@ -444,6 +444,16 @@ a {
   min-width: 0;
 }
 
+.history-row__title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .history-row__summary {
   margin: 4px 0 0;
   font-size: 12px;
