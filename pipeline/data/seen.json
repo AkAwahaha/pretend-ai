@@ -1,12 +1,12 @@
 {
-  "https://tldr.tech/ai/2026-09-09": "2026-09-13",
-  "https://github.com/nousresearch/hermes-agent": "2026-09-13",
-  "https://openai.com/index/using-codex-chatgpt-to-search-for-new-antimicrobials": "2026-09-13",
+  "https://tldr.tech/ai/2026-09-09": "2026-09-14",
+  "https://github.com/nousresearch/hermes-agent": "2026-09-14",
+  "https://openai.com/index/using-codex-chatgpt-to-search-for-new-antimicrobials": "2026-09-14",
   "https://openai.com/index/perplexity-improving-accuracy-with-astra": "2026-09-13",
-  "https://www.anthropic.com/news/improving-alignment-security-efforts": "2026-09-13",
-  "https://menlovc.com/perspective/stripe-to-acquire-openrouter-why-everyone-is-obsessed-with-model-routing/": "2026-09-13",
-  "https://huggingface.co/papers/2609.10745": "2026-09-13",
-  "https://deepmind.google/blog/proactive-cyber-defense-for-governments-and-enterprises/": "2026-09-13",
+  "https://www.anthropic.com/news/improving-alignment-security-efforts": "2026-09-14",
+  "https://menlovc.com/perspective/stripe-to-acquire-openrouter-why-everyone-is-obsessed-with-model-routing/": "2026-09-14",
+  "https://huggingface.co/papers/2609.10745": "2026-09-14",
+  "https://deepmind.google/blog/proactive-cyber-defense-for-governments-and-enterprises/": "2026-09-14",
   "https://openai.com/index/cognition-devin-testing-with-astra": "2026-09-13",
   "https://www.anthropic.com/news/model-hardware-standard-research-preview": "2026-09-13",
   "https://github.com/significant-gravitas/autogpt": "2026-09-13",
@@ -22,5 +22,6 @@
   "https://menlovc.com/perspective/the-keyboard-is-dying-on-schedule-the-text-box-is-next/": "2026-09-13",
   "https://deepmind.google/blog/introducing-weathernext-3-our-most-advanced-and-accurate-global-weather-ai-model/": "2026-09-13",
   "https://huggingface.co/papers/2609.09143": "2026-09-13",
-  "https://github.com/ollama/ollama": "2026-09-13"
+  "https://github.com/ollama/ollama": "2026-09-13",
+  "https://tldr.tech/ai/2026-09-11": "2026-09-14"
 }

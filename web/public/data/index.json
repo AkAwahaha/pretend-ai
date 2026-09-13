@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-09-14",
+    "label": "09.14",
+    "count": 8,
+    "title": "Agents API、Cognition SWE-2 与 Muse 共享智能体：三条 AI 智能体动态速览",
+    "sources": [
+      "TLDR AI",
+      "OpenAI",
+      "Anthropic",
+      "GitHub",
+      "Menlo Ventures",
+      "DeepMind",
+      "Hugging Face"
+    ]
+  },
+  {
     "date": "2026-09-13",
     "label": "09.13",
     "count": 8,
