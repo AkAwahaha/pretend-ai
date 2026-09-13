@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-09-13",
+    "label": "09.13",
+    "count": 8,
+    "title": "OpenAI 如何将 Habitat 从 Python 库扩展为支撑 10 亿 ChatGPT 用户的全球存储平台",
+    "sources": [
+      "OpenAI",
+      "Anthropic",
+      "GitHub",
+      "TLDR AI",
+      "Menlo Ventures",
+      "DeepMind",
+      "Hugging Face"
+    ]
+  },
+  {
     "date": "2026-09-12",
     "label": "09.12"
   }
