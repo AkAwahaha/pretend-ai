@@ -1,5 +1,16 @@
 [
   {
+    "date": "2026-09-15",
+    "label": "09.15",
+    "count": 5,
+    "title": "How Fyxer built an AI executive assistant people trust",
+    "sources": [
+      "OpenAI",
+      "TLDR AI",
+      "Hugging Face"
+    ]
+  },
+  {
     "date": "2026-09-14",
     "label": "09.14",
     "count": 8,
