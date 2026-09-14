@@ -1,0 +1,16 @@
+{
+  "name": "pretend-ai",
+  "private": true,
+  "version": "0.1.0",
+  "description": "假装懂 AI - 每日 AI 情报与开源项目日报",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "preview": "npm --prefix web run preview",
+    "test": "npm --prefix pipeline test && npm --prefix web test",
+    "test:pipeline": "npm --prefix pipeline test",
+    "test:web": "npm --prefix web test",
+    "generate": "npm --prefix pipeline run generate",
+    "fetch": "npm --prefix pipeline run fetch"
+  }
+}

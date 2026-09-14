@@ -72,3 +72,11 @@ npm test
 
 - Secret：`LLM_API_KEY`
 - Variables：`LLM_BASE_URL`、`LLM_MODEL`（可选）
+
+## 相关文档
+
+- 项目总览：[../README.md](../README.md)
+- 产品需求：[../docs/prd.md](../docs/prd.md)
+- 系统架构：[../docs/architecture.md](../docs/architecture.md)
+- 技术方案：[../docs/tech-design.md](../docs/tech-design.md)
+- UI 规格：[../docs/ui-spec.md](../docs/ui-spec.md)
