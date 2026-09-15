@@ -27,21 +27,27 @@ jobs:
       generated: ${{ steps.check.outputs.skip != 'true' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master
 
       - name: Check today's digest
         id: check
         run: |
           TODAY=$(TZ=Asia/Shanghai date +%F)
+          HOUR=$(TZ=Asia/Shanghai date +%-H)
           echo "today=$TODAY" >> "$GITHUB_OUTPUT"
           if [ "${{ inputs.force }}" = "true" ]; then
             echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "手动强制运行，忽略已有日报"
+            echo "手动强制运行，忽略时间与已有日报"
+          elif [ "$HOUR" -lt 8 ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "北京时间还没到 08:00（当前 ${HOUR} 点），本轮跳过"
           elif [ -f "web/public/data/archive/$TODAY.json" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "今天的日报已存在，跳过生成"
+            echo "今天的日报已存在，本轮跳过"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "今天还没有日报，开始生成"
+            echo "开始生成今天的日报"
           fi
 
       - uses: actions/setup-node@v4

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDigest, collectRawItems, dedupe, selectItems, writeDigest } from "./generate.js";
-import { fallbackCard, getLlmConfig, summarizeItem } from "./llm.js";
+import { getLlmConfig, summarizeItem } from "./llm.js";
 import { itemKey, loadSeen, saveSeen, splitFresh } from "./seen.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -30,13 +30,66 @@ async function loadEnv(filePath) {
   }
 }
 
+function buildPool({ fresh, stale, seen, poolLimit }) {
+  const pool = selectItems(fresh, { featuredCount: 0, maxItems: poolLimit });
+  if (pool.length >= poolLimit) {
+    return pool;
+  }
+
+  const used = new Set(pool.map((item) => itemKey(item)));
+  const staleSorted = stale
+    .filter((item) => !used.has(itemKey(item)))
+    .sort((a, b) => String(seen.get(itemKey(a)) ?? "").localeCompare(String(seen.get(itemKey(b)) ?? "")));
+
+  for (const item of staleSorted) {
+    if (pool.length >= poolLimit) {
+      break;
+    }
+    pool.push({ ...item, featured: false });
+  }
+
+  return pool;
+}
+
+async function pickCards(pool, { config, needed }) {
+  const picked = [];
+  let cursor = 0;
+  const concurrency = Math.max(1, Math.min(config.concurrency ?? 3, pool.length || 1));
+
+  async function worker() {
+    while (true) {
+      if (picked.length >= needed) {
+        return;
+      }
+      const current = cursor;
+      cursor += 1;
+      if (current >= pool.length) {
+        return;
+      }
+      const item = pool[current];
+      try {
+        const card = await summarizeItem(item, { config });
+        if (picked.length >= needed) {
+          return;
+        }
+        picked.push({ order: current, item, card });
+        console.log("已生成：" + card.title);
+      } catch (error) {
+        console.warn("跳过：" + item.title + "（" + error.message + "）");
+      }
+    }
+  }
+
+  await Promise.all(Array.from({ length: concurrency }, () => worker()));
+  return picked.sort((a, b) => a.order - b.order).slice(0, needed);
+}
+
 await loadEnv(path.join(here, "..", ".env"));
 
 const args = process.argv.slice(2);
 const fetchOnly = args.includes("--fetch-only");
 const maxItems = Number(process.env.MAX_ITEMS || 8);
 const featuredCount = Number(process.env.FEATURED_COUNT || 3);
-const minFresh = Number(process.env.MIN_FRESH || Math.ceil(maxItems / 2));
 const date =
   process.env.DIGEST_DATE ||
   new Intl.DateTimeFormat("sv-SE", { timeZone: process.env.TZ || "Asia/Shanghai" }).format(new Date());
@@ -53,29 +106,13 @@ console.log(
   "去重后 " + deduped.length + " 条：新内容 " + fresh.length + " 条，历史重复 " + stale.length + " 条",
 );
 
-let selected = selectItems(fresh, { featuredCount, maxItems });
-
-if (selected.length < minFresh) {
-  const need = maxItems - selected.length;
-  const used = new Set(selected.map((item) => itemKey(item)));
-  const pool = stale.filter((item) => !used.has(itemKey(item)));
-  const alreadyFeatured = selected.filter((item) => item.featured).length;
-  const topped = selectItems(pool, {
-    featuredCount: Math.max(0, featuredCount - alreadyFeatured),
-    maxItems: need,
-  });
-  if (topped.length > 0) {
-    console.log("新内容不足，用历史内容补 " + topped.length + " 条");
-    selected = [...selected, ...topped];
-  }
-}
-
-console.log("选中 " + selected.length + " 条，其中精读 " + selected.filter((item) => item.featured).length + " 条");
+const pool = buildPool({ fresh, stale, seen, poolLimit: maxItems * 2 });
+console.log("候选池 " + pool.length + " 条");
 
 if (fetchOnly) {
   console.log(
     JSON.stringify(
-      selected.map((item) => ({
+      pool.map((item) => ({
         source: item.sourceLabel,
         category: item.category,
         fresh: freshKeys.has(itemKey(item)),
@@ -90,22 +127,21 @@ if (fetchOnly) {
 }
 
 const config = getLlmConfig();
-const cards = [];
+if (!config.configured) {
+  console.error("未配置 LLM_API_KEY，已终止生成");
+  process.exit(1);
+}
+console.log(
+  "大模型配置：模型 " + config.model + "，并发 " + config.concurrency + "，单次超时 " + config.timeoutMs + "ms",
+);
 
-for (const item of selected) {
-  try {
-    if (!config.configured) {
-      throw new Error("未配置 LLM_API_KEY");
-    }
-    const card = await summarizeItem(item, { config });
-    cards.push(card);
-    console.log("已生成：" + card.title);
-  } catch (error) {
-    console.warn("降级处理 " + item.title + "：" + error.message);
-    cards.push(fallbackCard(item));
-  }
+const picked = await pickCards(pool, { config, needed: maxItems });
+if (picked.length < maxItems) {
+  console.warn("只生成了 " + picked.length + " 条（目标 " + maxItems + " 条），其余候选生成失败");
 }
 
+const selected = picked.map((entry, index) => ({ ...entry.item, featured: index < featuredCount }));
+const cards = picked.map((entry) => entry.card);
 const digest = buildDigest({ date, selected, cards });
 await writeDigest(digest, { outDir });
 
