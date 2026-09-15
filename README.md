@@ -28,7 +28,7 @@ GitHub Actions（每小时尝试，当天日报已存在则跳过）
    └─ 7. 部署到 GitHub Pages
 ```
 
-详细说明见 [docs/architecture.md](docs/architecture.md)，信息源清单见 [docs/sources.md](docs/sources.md)。
+详细说明见 [docs/architecture.md](docs/architecture.md)，信息源清单见 [docs/sources.md](docs/sources.md)，AI 落地步骤见 [docs/ai-playbook.md](docs/ai-playbook.md)。
 
 ## 目录结构
 
