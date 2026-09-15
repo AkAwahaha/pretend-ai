@@ -3,10 +3,13 @@
     "date": "2026-09-15",
     "label": "09.15",
     "count": 8,
-    "title": "量子位页面被入侵事件",
+    "title": "Anthropic 发布模型硬件标准（MHS）研究预览",
     "sources": [
+      "Anthropic",
       "量子位",
       "TechCrunch AI",
+      "GitHub",
+      "TLDR AI",
       "Crunchbase News",
       "Hugging Face"
     ]
