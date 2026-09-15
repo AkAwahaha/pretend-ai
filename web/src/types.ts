@@ -7,7 +7,16 @@ export type SourceKey =
   | "tldr"
   | "a16z"
   | "menlo"
-  | "arxiv";
+  | "arxiv"
+  | "qbitai"
+  | "aiera"
+  | "infoq"
+  | "techcrunch"
+  | "theverge"
+  | "arstechnica"
+  | "hackernews"
+  | "mittechreview"
+  | "crunchbase";
 
 export interface DigestItem {
   id: string;

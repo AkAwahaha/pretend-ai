@@ -30,8 +30,8 @@ async function loadEnv(filePath) {
   }
 }
 
-function buildPool({ fresh, stale, seen, poolLimit }) {
-  const pool = selectItems(fresh, { featuredCount: 0, maxItems: poolLimit });
+function buildPool({ fresh, stale, seen, poolLimit, seed }) {
+  const pool = selectItems(fresh, { featuredCount: 0, maxItems: poolLimit, seed });
   if (pool.length >= poolLimit) {
     return pool;
   }
@@ -132,7 +132,7 @@ console.log(
   "去重后 " + deduped.length + " 条：新内容 " + fresh.length + " 条，历史重复 " + stale.length + " 条",
 );
 
-const pool = buildPool({ fresh, stale, seen, poolLimit: maxItems * 2 });
+const pool = buildPool({ fresh, stale, seen, poolLimit: maxItems * 2, seed: date });
 console.log("候选池 " + pool.length + " 条");
 
 if (fetchOnly) {

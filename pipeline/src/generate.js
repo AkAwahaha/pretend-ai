@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { SOURCES, fetchSource } from "./sources.js";
 
-const CATEGORY_PRIORITY = ["一手官方", "项目发现", "省时日报", "商业视角", "前沿论文"];
+const CATEGORY_PRIORITY = ["一手官方", "国内动态", "行业新闻", "项目发现", "省时日报", "商业视角", "前沿论文"];
 
 export function normalizeTitle(title) {
   return String(title).toLowerCase().replace(/\s+/g, " ").trim();
@@ -22,7 +22,16 @@ export function dedupe(items) {
   return result;
 }
 
-export function rankItems(items) {
+function rotationScore(value, seed) {
+  const key = String(value) + "|" + String(seed);
+  let hash = 0;
+  for (let index = 0; index < key.length; index += 1) {
+    hash = (hash * 31 + key.charCodeAt(index)) % 1000003;
+  }
+  return hash;
+}
+
+export function rankItems(items, { seed = "" } = {}) {
   return [...items].sort((a, b) => {
     const indexA = CATEGORY_PRIORITY.indexOf(a.category);
     const indexB = CATEGORY_PRIORITY.indexOf(b.category);
@@ -31,34 +40,52 @@ export function rankItems(items) {
     if (priorityA !== priorityB) {
       return priorityA - priorityB;
     }
+    const rotateA = rotationScore(a.sourceKey, seed);
+    const rotateB = rotationScore(b.sourceKey, seed);
+    if (rotateA !== rotateB) {
+      return rotateA - rotateB;
+    }
     return String(b.publishedAt).localeCompare(String(a.publishedAt));
   });
 }
 
-export function selectItems(items, { featuredCount = 3, maxItems = 8 } = {}) {
-  const ranked = rankItems(items);
+export function selectItems(items, { featuredCount = 3, maxItems = 8, seed = "" } = {}) {
+  const ranked = rankItems(items, { seed });
   const buckets = new Map();
+  const categoryOf = new Map();
 
   for (const item of ranked) {
     const bucket = buckets.get(item.sourceKey) ?? [];
     bucket.push(item);
     buckets.set(item.sourceKey, bucket);
+    if (!categoryOf.has(item.sourceKey)) {
+      categoryOf.set(item.sourceKey, item.category);
+    }
   }
 
   const ordered = [];
   let round = 0;
 
   while (ordered.length < maxItems) {
+    const usedCategories = new Set();
     let added = false;
-    for (const bucket of buckets.values()) {
+
+    for (const [sourceKey, bucket] of buckets) {
       if (ordered.length >= maxItems) {
         break;
       }
-      if (round < bucket.length) {
-        ordered.push(bucket[round]);
-        added = true;
+      if (round >= bucket.length) {
+        continue;
       }
+      const category = categoryOf.get(sourceKey);
+      if (usedCategories.has(category)) {
+        continue;
+      }
+      ordered.push(bucket[round]);
+      usedCategories.add(category);
+      added = true;
     }
+
     if (!added) {
       break;
     }
@@ -140,10 +167,7 @@ export async function writeDigest(digest, { outDir }) {
     sources: Array.from(new Set(digest.items.map((item) => item.sourceLabel))),
   };
 
-  const next = [
-    entry,
-    ...index.filter((item) => item?.date !== digest.date),
-  ].slice(0, 90);
+  const next = [entry, ...index.filter((item) => item?.date !== digest.date)].slice(0, 90);
 
   await writeJson(indexPath, next);
 }
