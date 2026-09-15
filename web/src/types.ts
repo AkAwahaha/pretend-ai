@@ -16,7 +16,10 @@ export type SourceKey =
   | "arstechnica"
   | "hackernews"
   | "mittechreview"
-  | "crunchbase";
+  | "crunchbase"
+  | "tmtpost"
+  | "leiphone"
+  | "ifanr";
 
 export interface DigestItem {
   id: string;

@@ -19,6 +19,9 @@ export const SOURCE_META: Record<SourceKey, { label: string; color: string; tint
   hackernews: { label: "Hacker News", color: "#EA580C", tint: "#FDECE3" },
   mittechreview: { label: "MIT Tech Review", color: "#1D4ED8", tint: "#E5EDFC" },
   crunchbase: { label: "Crunchbase", color: "#0891B2", tint: "#E2F4F8" },
+  tmtpost: { label: "钛媒体", color: "#7C2D12", tint: "#F6E7E1" },
+  leiphone: { label: "雷峰网", color: "#1E40AF", tint: "#E5EAFB" },
+  ifanr: { label: "爱范儿", color: "#047857", tint: "#E2F5EE" },
 };
 
 export const CATEGORIES = [
