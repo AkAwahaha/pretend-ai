@@ -51,6 +51,32 @@ function buildPool({ fresh, stale, seen, poolLimit }) {
   return pool;
 }
 
+function roundRobinBySource(entries) {
+  const buckets = new Map();
+  for (const entry of entries) {
+    const bucket = buckets.get(entry.item.sourceKey) ?? [];
+    bucket.push(entry);
+    buckets.set(entry.item.sourceKey, bucket);
+  }
+
+  const ordered = [];
+  let round = 0;
+  while (ordered.length < entries.length) {
+    let added = false;
+    for (const bucket of buckets.values()) {
+      if (round < bucket.length) {
+        ordered.push(bucket[round]);
+        added = true;
+      }
+    }
+    if (!added) {
+      break;
+    }
+    round += 1;
+  }
+  return ordered;
+}
+
 async function pickCards(pool, { config, needed }) {
   const picked = [];
   let cursor = 0;
@@ -140,8 +166,9 @@ if (picked.length < maxItems) {
   console.warn("只生成了 " + picked.length + " 条（目标 " + maxItems + " 条），其余候选生成失败");
 }
 
-const selected = picked.map((entry, index) => ({ ...entry.item, featured: index < featuredCount }));
-const cards = picked.map((entry) => entry.card);
+const ordered = roundRobinBySource(picked);
+const selected = ordered.map((entry, index) => ({ ...entry.item, featured: index < featuredCount }));
+const cards = ordered.map((entry) => entry.card);
 const digest = buildDigest({ date, selected, cards });
 await writeDigest(digest, { outDir });
 
