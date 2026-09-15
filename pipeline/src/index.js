@@ -31,24 +31,11 @@ async function loadEnv(filePath) {
 }
 
 function buildPool({ fresh, stale, seen, poolLimit, seed }) {
-  const pool = selectItems(fresh, { featuredCount: 0, maxItems: poolLimit, seed });
-  if (pool.length >= poolLimit) {
-    return pool;
-  }
-
-  const used = new Set(pool.map((item) => itemKey(item)));
-  const staleSorted = stale
-    .filter((item) => !used.has(itemKey(item)))
-    .sort((a, b) => String(seen.get(itemKey(a)) ?? "").localeCompare(String(seen.get(itemKey(b)) ?? "")));
-
-  for (const item of staleSorted) {
-    if (pool.length >= poolLimit) {
-      break;
-    }
-    pool.push({ ...item, featured: false });
-  }
-
-  return pool;
+  const staleSorted = [...stale].sort((a, b) =>
+    String(seen.get(itemKey(a)) ?? "").localeCompare(String(seen.get(itemKey(b)) ?? "")),
+  );
+  const combined = [...fresh, ...staleSorted];
+  return selectItems(combined, { featuredCount: 0, maxItems: poolLimit, seed });
 }
 
 function roundRobinBySource(entries) {

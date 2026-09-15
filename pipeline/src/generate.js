@@ -32,21 +32,25 @@ function rotationScore(value, seed) {
 }
 
 export function rankItems(items, { seed = "" } = {}) {
-  return [...items].sort((a, b) => {
-    const indexA = CATEGORY_PRIORITY.indexOf(a.category);
-    const indexB = CATEGORY_PRIORITY.indexOf(b.category);
-    const priorityA = indexA === -1 ? CATEGORY_PRIORITY.length : indexA;
-    const priorityB = indexB === -1 ? CATEGORY_PRIORITY.length : indexB;
-    if (priorityA !== priorityB) {
-      return priorityA - priorityB;
-    }
-    const rotateA = rotationScore(a.sourceKey, seed);
-    const rotateB = rotationScore(b.sourceKey, seed);
-    if (rotateA !== rotateB) {
-      return rotateA - rotateB;
-    }
-    return String(b.publishedAt).localeCompare(String(a.publishedAt));
-  });
+  return items
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      const indexA = CATEGORY_PRIORITY.indexOf(a.item.category);
+      const indexB = CATEGORY_PRIORITY.indexOf(b.item.category);
+      const priorityA = indexA === -1 ? CATEGORY_PRIORITY.length : indexA;
+      const priorityB = indexB === -1 ? CATEGORY_PRIORITY.length : indexB;
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+      const rotateA = rotationScore(a.item.sourceKey, seed);
+      const rotateB = rotationScore(b.item.sourceKey, seed);
+      if (rotateA !== rotateB) {
+        return rotateA - rotateB;
+      }
+      // 保持调用方给定的优先顺序（新内容优先，其次最久未发布的历史内容）
+      return a.index - b.index;
+    })
+    .map((entry) => entry.item);
 }
 
 export function selectItems(items, { featuredCount = 3, maxItems = 8, seed = "" } = {}) {
