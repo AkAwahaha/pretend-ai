@@ -3,7 +3,7 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
-import { buildDigest, computeHeat, dedupe, selectItems, writeDigest } from "../src/generate.js";
+import { buildDigest, dedupe, scoreItems, selectItems, writeDigest } from "../src/generate.js";
 
 function sample(overrides = {}) {
   return {
@@ -54,21 +54,50 @@ describe("buildDigest", () => {
   });
 });
 
-describe("computeHeat", () => {
-  it("平台热度与靠前排位会提高分数", () => {
+describe("scoreItems", () => {
+  it("平台数据与靠前排位会提高热度分", () => {
     const now = Date.now();
-    const cold = computeHeat({ category: "一手官方", rank: 4, publishedAt: "", heat: 0 }, { now });
-    const hot = computeHeat(
-      { category: "一手官方", rank: 0, publishedAt: new Date(now).toISOString(), heat: 800 },
-      { now },
-    );
-    assert.ok(hot > cold);
-    assert.ok(hot <= 100);
+    const items = [
+      {
+        sourceKey: "hackernews",
+        sourceLabel: "Hacker News",
+        title: "OpenAI 发布新模型引发讨论",
+        publishedAt: new Date(now).toISOString(),
+        rank: 0,
+        heat: 1500,
+      },
+      {
+        sourceKey: "arxiv",
+        sourceLabel: "arXiv",
+        title: "蛋白质结构预测的一篇普通论文",
+        publishedAt: "",
+        rank: 4,
+        heat: 0,
+      },
+    ];
+
+    const scored = scoreItems(items, { now });
+
+    assert.ok(scored[0].heat > scored[1].heat);
+    assert.ok(scored[0].heat >= 0 && scored[0].heat <= 100);
   });
 
-  it("缺失字段时也能算出基础分", () => {
-    const score = computeHeat({}, { now: Date.now() });
-    assert.ok(score >= 0 && score <= 100);
+  it("多个来源报道同一话题时热度更高", () => {
+    const now = Date.now();
+    const base = { publishedAt: new Date(now).toISOString(), rank: 0, heat: 0 };
+    const items = [
+      { ...base, sourceKey: "techcrunch", sourceLabel: "TechCrunch", title: "OpenAI 收购 Glass Imaging" },
+      { ...base, sourceKey: "theverge", sourceLabel: "The Verge", title: "OpenAI 收购 Glass Imaging 引发讨论" },
+      { ...base, sourceKey: "arxiv", sourceLabel: "arXiv", title: "蛋白质结构预测的一篇普通论文" },
+    ];
+
+    const scored = scoreItems(items, { now });
+
+    assert.ok(scored[0].heat > scored[2].heat);
+  });
+
+  it("空数组不会报错", () => {
+    assert.deepEqual(scoreItems([]), []);
   });
 });
 

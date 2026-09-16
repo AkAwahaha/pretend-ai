@@ -4,15 +4,91 @@ import { SOURCES, fetchSource } from "./sources.js";
 
 const CATEGORY_PRIORITY = ["一手官方", "国内动态", "行业新闻", "项目发现", "省时日报", "商业视角", "前沿论文"];
 
-const SOURCE_WEIGHT = {
-  一手官方: 1,
-  行业新闻: 0.9,
-  国内动态: 0.85,
-  项目发现: 0.8,
-  省时日报: 0.75,
-  商业视角: 0.7,
-  前沿论文: 0.6,
-};
+const HOT_KEYWORDS = [
+  "发布",
+  "推出",
+  "上线",
+  "开放",
+  "融资",
+  "收购",
+  "并购",
+  "开源",
+  "突破",
+  "泄露",
+  "监管",
+  "法规",
+  "备案",
+  "禁用",
+  "下架",
+  "涨价",
+  "降价",
+  "合作",
+  "芯片",
+  "算力",
+  "模型",
+  "agent",
+  "裁员",
+  "离职",
+  "诉讼",
+];
+
+const STOP_WORDS = new Set([
+  "the",
+  "and",
+  "for",
+  "with",
+  "that",
+  "this",
+  "from",
+  "are",
+  "was",
+  "were",
+  "will",
+  "has",
+  "have",
+  "new",
+  "how",
+  "why",
+  "what",
+  "its",
+  "can",
+  "you",
+  "your",
+  "their",
+  "about",
+  "after",
+  "into",
+  "over",
+  "more",
+  "than",
+  "not",
+  "but",
+]);
+
+function tokenize(text) {
+  const tokens = new Set();
+  const lower = String(text ?? "").toLowerCase();
+
+  for (const word of lower.match(/[a-z][a-z0-9+#.-]{3,}/g) ?? []) {
+    if (!STOP_WORDS.has(word)) {
+      tokens.add(word);
+    }
+  }
+
+  const chinese = lower.replace(/[^\u4e00-\u9fa5]+/g, " ");
+  for (const segment of chinese.split(/\s+/)) {
+    if (segment.length < 3) {
+      continue;
+    }
+    for (let size = 3; size <= Math.min(4, segment.length); size += 1) {
+      for (let index = 0; index + size <= segment.length; index += 1) {
+        tokens.add(segment.slice(index, index + size));
+      }
+    }
+  }
+
+  return tokens;
+}
 
 function recencyScore(publishedAt, now) {
   const time = Date.parse(String(publishedAt ?? ""));
@@ -30,21 +106,59 @@ function rankScore(rank) {
 function platformScore(heat) {
   const value = Number(heat ?? 0);
   if (!Number.isFinite(value) || value <= 0) {
-    return 0;
+    return 0.5;
   }
-  return Math.min(1, value / 800);
+  return Math.max(0.5, Math.min(1, value / 800));
 }
 
-export function computeHeat(item, { now = Date.now() } = {}) {
-  const aiHeat = Math.max(0, Math.min(100, Number(item.aiHeat ?? 0)));
-  const weight = SOURCE_WEIGHT[item.category] ?? 0.7;
-  const score =
-    aiHeat * 0.55 +
-    weight * 15 +
-    rankScore(item.rank) * 10 +
-    recencyScore(item.publishedAt, now) * 10 +
-    platformScore(item.heat) * 10;
-  return Math.round(Math.max(0, Math.min(100, score)));
+function keywordScore(title) {
+  const text = String(title ?? "").toLowerCase();
+  const hits = HOT_KEYWORDS.filter((keyword) => text.includes(keyword)).length;
+  return Math.min(1, hits / 3);
+}
+
+function crossSourceScore(items, tokensByItem, index) {
+  const documentFrequency = new Map();
+  for (const tokens of tokensByItem) {
+    for (const token of tokens) {
+      documentFrequency.set(token, (documentFrequency.get(token) ?? 0) + 1);
+    }
+  }
+  const maxFrequency = Math.max(2, Math.ceil(items.length * 0.4));
+
+  const matchedSources = new Set();
+  for (let other = 0; other < items.length; other += 1) {
+    if (other === index) {
+      continue;
+    }
+    const otherTokens = tokensByItem[other];
+    for (const token of tokensByItem[index]) {
+      const frequency = documentFrequency.get(token) ?? 0;
+      if (frequency >= 2 && frequency <= maxFrequency && otherTokens.has(token)) {
+        matchedSources.add(items[other].sourceKey);
+        break;
+      }
+    }
+  }
+
+  return Math.min(1, matchedSources.size / 3);
+}
+
+export function scoreItems(items, { now = Date.now() } = {}) {
+  const tokensByItem = items.map((item) =>
+    tokenize(String(item.title ?? "") + " " + String(item.sourceLabel ?? "")),
+  );
+
+  return items.map((item, index) => {
+    const score =
+      crossSourceScore(items, tokensByItem, index) * 35 +
+      platformScore(item.heat) * 25 +
+      rankScore(item.rank) * 20 +
+      recencyScore(item.publishedAt, now) * 10 +
+      keywordScore(item.title) * 10;
+
+    return { ...item, heat: Math.round(Math.max(0, Math.min(100, score))) };
+  });
 }
 
 export function normalizeTitle(title) {

@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildDigest, collectRawItems, computeHeat, dedupe, selectItems, writeDigest } from "./generate.js";
+import { buildDigest, collectRawItems, dedupe, scoreItems, selectItems, writeDigest } from "./generate.js";
 import { getLlmConfig, summarizeItem } from "./llm.js";
 import { itemKey, loadSeen, saveSeen, splitFresh } from "./seen.js";
 
@@ -126,15 +126,13 @@ if (picked.length < maxItems) {
   console.warn("只生成了 " + picked.length + " 条（目标 " + maxItems + " 条），其余候选生成失败");
 }
 
-const scored = picked
-  .map((entry) => ({
-    ...entry,
-    score: computeHeat({ ...entry.item, aiHeat: entry.card.heat }),
-  }))
-  .sort((a, b) => b.score - a.score);
+const scoredItems = scoreItems(picked.map((entry) => entry.item));
+const ordered = picked
+  .map((entry, index) => ({ ...entry, scored: scoredItems[index] }))
+  .sort((a, b) => b.scored.heat - a.scored.heat);
 
-const selected = scored.map((entry) => ({ ...entry.item, featured: false, heat: entry.score }));
-const cards = scored.map((entry) => entry.card);
+const selected = ordered.map((entry) => ({ ...entry.item, featured: false, heat: entry.scored.heat }));
+const cards = ordered.map((entry) => entry.card);
 const digest = buildDigest({ date, selected, cards });
 await writeDigest(digest, { outDir });
 
