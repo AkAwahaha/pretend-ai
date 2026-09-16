@@ -48,6 +48,7 @@ describe("validateCard", () => {
       highlights: "D",
       productView: "E",
       topic: "模型技术快讯",
+      heat: 70,
     });
     assert.equal(result.ok, true);
   });
@@ -90,6 +91,7 @@ describe("summarizeItem", () => {
               productView: "产品视角",
               readTime: "2 min",
               topic: "模型技术快讯",
+              heat: 70,
             }),
           },
         },

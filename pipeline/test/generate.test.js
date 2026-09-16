@@ -3,7 +3,7 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
-import { buildDigest, dedupe, selectItems, writeDigest } from "../src/generate.js";
+import { buildDigest, computeHeat, dedupe, selectItems, writeDigest } from "../src/generate.js";
 
 function sample(overrides = {}) {
   return {
@@ -49,7 +49,26 @@ describe("buildDigest", () => {
     const digest = buildDigest({ date: "2026-09-12", selected, cards });
     assert.equal(digest.label, "09.12");
     assert.equal(digest.items[0].title, "T");
-    assert.equal(digest.items[0].featured, true);
+    assert.equal(digest.items[0].featured, false);
+    assert.equal(digest.items[0].heat, 0);
+  });
+});
+
+describe("computeHeat", () => {
+  it("平台热度与靠前排位会提高分数", () => {
+    const now = Date.now();
+    const cold = computeHeat({ category: "一手官方", rank: 4, publishedAt: "", heat: 0 }, { now });
+    const hot = computeHeat(
+      { category: "一手官方", rank: 0, publishedAt: new Date(now).toISOString(), heat: 800 },
+      { now },
+    );
+    assert.ok(hot > cold);
+    assert.ok(hot <= 100);
+  });
+
+  it("缺失字段时也能算出基础分", () => {
+    const score = computeHeat({}, { now: Date.now() });
+    assert.ok(score >= 0 && score <= 100);
   });
 });
 

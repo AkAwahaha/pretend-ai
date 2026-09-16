@@ -1,4 +1,4 @@
-import { GlanceRow } from "../components/GlanceRow";
+import { ItemCard } from "../components/ItemCard";
 import { GlowBackground } from "../components/GlowBackground";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
@@ -24,7 +24,7 @@ export function FavoritesPage({ items, isFavorite, onToggleFavorite, onOpen, onB
         ) : (
           <div className="stack">
             {items.map((item) => (
-              <GlanceRow
+              <ItemCard
                 key={item.id}
                 item={item}
                 favorite={isFavorite(item.id)}

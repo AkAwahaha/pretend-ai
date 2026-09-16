@@ -18,15 +18,15 @@ function renderTodayPage() {
 }
 
 describe("TodayPage", () => {
-  it("渲染精读与速览分区", () => {
+  it("渲染内容列表与热度排序说明", () => {
     renderTodayPage();
 
-    expect(screen.getByRole("heading", { name: /精读/ })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /速览/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /今日/ })).toBeInTheDocument();
+    expect(screen.getByText("按热度排序")).toBeInTheDocument();
     expect(screen.getByText(TODAY_DIGEST.items[0].title)).toBeInTheDocument();
   });
 
-  it("按分类筛选内容", () => {
+  it("按主题筛选内容", () => {
     renderTodayPage();
 
     fireEvent.click(screen.getByRole("tab", { name: "开源开发者生态" }));

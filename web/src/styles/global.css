@@ -650,3 +650,86 @@ body {
   font-size: 14px;
   line-height: 21px;
 }
+/* ===== 统一卡片（按热度排序）===== */
+
+.item-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 16px 14px 18px;
+  border-radius: var(--radius-card);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 12px rgba(23, 24, 28, 0.05);
+}
+
+.item-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--brand);
+  opacity: 0.28;
+}
+
+.item-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.item-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.heat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fff1e8;
+  color: #d9480f;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.item-card__title {
+  margin: 4px 0 0;
+  font-size: 16px;
+  line-height: 25px;
+  font-weight: 600;
+}
+
+.item-card__title button {
+  text-align: left;
+}
+
+.item-card__summary {
+  margin: 0;
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--text-secondary);
+}
+
+.item-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.item-card__time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}

@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { FilterChips } from "../components/FilterChips";
-import { DeepCard } from "../components/DeepCard";
-import { GlanceRow } from "../components/GlanceRow";
 import { GlowBackground } from "../components/GlowBackground";
+import { ItemCard } from "../components/ItemCard";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
 import type { Category } from "../data/sources";
@@ -19,12 +18,10 @@ interface TodayPageProps {
 export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack }: TodayPageProps) {
   const [category, setCategory] = useState<Category>("全部");
 
-  const filtered = useMemo(
+  const items = useMemo(
     () => (category === "全部" ? digest.items : digest.items.filter((item) => item.category === category)),
     [digest.items, category],
   );
-  const featured = filtered.filter((item) => item.featured);
-  const glance = filtered.filter((item) => !item.featured);
 
   return (
     <div className="frame">
@@ -50,45 +47,23 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
 
         <FilterChips value={category} onChange={setCategory} />
 
-        {featured.length > 0 ? (
-          <section className="section">
-            <h2 className="section__title">
-              精读 <span className="section__count">{featured.length} 条 · 完整拆解</span>
-            </h2>
-            <div className="stack">
-              {featured.map((item) => (
-                <DeepCard
-                  key={item.id}
-                  item={item}
-                  favorite={isFavorite(item.id)}
-                  onToggleFavorite={onToggleFavorite}
-                  onOpen={onOpen}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {glance.length > 0 ? (
-          <section className="section">
-            <h2 className="section__title">
-              速览 <span className="section__count">{glance.length} 条 · 快速扫过</span>
-            </h2>
-            <div className="stack stack--list">
-              {glance.map((item) => (
-                <GlanceRow
-                  key={item.id}
-                  item={item}
-                  favorite={isFavorite(item.id)}
-                  onToggleFavorite={onToggleFavorite}
-                  onOpen={onOpen}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {filtered.length === 0 ? <p className="empty-state">这个分类今天还没有内容</p> : null}
+        <section className="section">
+          <h2 className="section__title">
+            今日 {items.length} 条 <span className="section__count">按热度排序</span>
+          </h2>
+          <div className="stack">
+            {items.map((item) => (
+              <ItemCard
+                key={item.id}
+                item={item}
+                favorite={isFavorite(item.id)}
+                onToggleFavorite={onToggleFavorite}
+                onOpen={onOpen}
+              />
+            ))}
+          </div>
+          {items.length === 0 ? <p className="empty-state">这个分类今天还没有内容</p> : null}
+        </section>
       </div>
 
       <TabBar current={onBack ? "day" : "today"} />

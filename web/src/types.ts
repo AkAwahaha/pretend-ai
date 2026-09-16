@@ -34,6 +34,7 @@ export interface DigestItem {
   productView: string;
   sourceUrl: string;
   readTime: string;
+  heat?: number;
   featured: boolean;
 }
 

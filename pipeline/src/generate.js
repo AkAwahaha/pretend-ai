@@ -4,6 +4,49 @@ import { SOURCES, fetchSource } from "./sources.js";
 
 const CATEGORY_PRIORITY = ["一手官方", "国内动态", "行业新闻", "项目发现", "省时日报", "商业视角", "前沿论文"];
 
+const SOURCE_WEIGHT = {
+  一手官方: 1,
+  行业新闻: 0.9,
+  国内动态: 0.85,
+  项目发现: 0.8,
+  省时日报: 0.75,
+  商业视角: 0.7,
+  前沿论文: 0.6,
+};
+
+function recencyScore(publishedAt, now) {
+  const time = Date.parse(String(publishedAt ?? ""));
+  if (Number.isNaN(time)) {
+    return 0.4;
+  }
+  const hours = Math.max(0, (now - time) / 3600000);
+  return Math.max(0, 1 - hours / 72);
+}
+
+function rankScore(rank) {
+  return Math.max(0, 1 - Number(rank ?? 0) / 5);
+}
+
+function platformScore(heat) {
+  const value = Number(heat ?? 0);
+  if (!Number.isFinite(value) || value <= 0) {
+    return 0;
+  }
+  return Math.min(1, value / 800);
+}
+
+export function computeHeat(item, { now = Date.now() } = {}) {
+  const aiHeat = Math.max(0, Math.min(100, Number(item.aiHeat ?? 0)));
+  const weight = SOURCE_WEIGHT[item.category] ?? 0.7;
+  const score =
+    aiHeat * 0.55 +
+    weight * 15 +
+    rankScore(item.rank) * 10 +
+    recencyScore(item.publishedAt, now) * 10 +
+    platformScore(item.heat) * 10;
+  return Math.round(Math.max(0, Math.min(100, score)));
+}
+
 export function normalizeTitle(title) {
   return String(title).toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -134,7 +177,8 @@ export function buildDigest({ date, selected, cards }) {
       sourceLabel: item.sourceLabel,
       category: cards[index].topic ?? item.category,
       sourceCategory: item.category,
-      featured: item.featured,
+      featured: false,
+      heat: Number(item.heat ?? 0),
       sourceUrl: item.url,
       readTime: cards[index].readTime,
       title: cards[index].title,

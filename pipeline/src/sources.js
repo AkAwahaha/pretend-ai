@@ -104,10 +104,9 @@ export const SOURCES = [
     key: "hackernews",
     label: "Hacker News",
     category: "行业新闻",
-    type: "rss",
-    url: "https://hnrss.org/frontpage?points=200",
+    type: "hn",
+    url: "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=10",
     limit: 5,
-    optional: true,
   },
   {
     key: "mittechreview",
@@ -171,7 +170,7 @@ export const SOURCES = [
   },
 ];
 
-function toRaw(source, entry) {
+function toRaw(source, entry, index) {
   return {
     sourceKey: source.key,
     sourceLabel: source.label,
@@ -180,6 +179,8 @@ function toRaw(source, entry) {
     url: entry.url,
     content: entry.summary || entry.title,
     publishedAt: entry.publishedAt || "",
+    rank: typeof index === "number" ? index : 0,
+    heat: Number(entry.heat ?? 0),
   };
 }
 
@@ -194,7 +195,7 @@ export async function fetchSource(source, { fetchTextImpl = fetchText } = {}) {
     });
     return parseFeed(xml)
       .slice(0, source.limit)
-      .map((entry) => toRaw(source, entry));
+      .map((entry, index) => toRaw(source, entry, index));
   }
 
   if (source.type === "arxiv") {
@@ -203,7 +204,7 @@ export async function fetchSource(source, { fetchTextImpl = fetchText } = {}) {
     });
     return parseFeed(xml)
       .slice(0, source.limit)
-      .map((entry) => toRaw(source, entry));
+      .map((entry, index) => toRaw(source, entry, index));
   }
 
   if (source.type === "github") {
@@ -214,7 +215,7 @@ export async function fetchSource(source, { fetchTextImpl = fetchText } = {}) {
       "&sort=stars&order=desc&per_page=" +
       source.limit;
     const payload = JSON.parse(await fetchTextImpl(url, { headers: { accept: "application/vnd.github+json" } }));
-    return (payload.items ?? []).map((repo) =>
+    return (payload.items ?? []).map((repo, index) =>
       toRaw(source, {
         title: repo.full_name,
         url: repo.html_url,
@@ -226,7 +227,8 @@ export async function fetchSource(source, { fetchTextImpl = fetchText } = {}) {
           .filter(Boolean)
           .join(" · "),
         publishedAt: repo.pushed_at ?? "",
-      }),
+        heat: repo.stargazers_count ?? 0,
+      }, index),
     );
   }
 
@@ -235,22 +237,38 @@ export async function fetchSource(source, { fetchTextImpl = fetchText } = {}) {
     const list = Array.isArray(payload) ? payload : payload.papers ?? [];
     return list
       .slice(0, source.limit)
-      .map((entry) => {
+      .map((entry, index) => {
         const paper = entry.paper ?? entry;
         return toRaw(source, {
           title: paper.title ?? "",
           url: paper.url ?? (paper.id ? "https://huggingface.co/papers/" + paper.id : source.url),
           summary: paper.summary ?? "",
           publishedAt: paper.publishedAt ?? entry.publishedAt ?? "",
-        });
+        }, index);
       })
+      .filter((item) => item.title);
+  }
+
+  if (source.type === "hn") {
+    const payload = JSON.parse(await fetchTextImpl(source.url, { headers: { accept: "application/json" } }));
+    return (payload.hits ?? [])
+      .slice(0, source.limit)
+      .map((hit, index) =>
+        toRaw(source, {
+          title: hit.title ?? hit.story_title ?? "",
+          url: hit.url ?? (hit.objectID ? "https://news.ycombinator.com/item?id=" + hit.objectID : source.url),
+          summary: hit.story_text ?? "",
+          publishedAt: hit.created_at ?? "",
+          heat: hit.points ?? 0,
+        }, index),
+      )
       .filter((item) => item.title);
   }
 
   if (source.type === "html") {
     const html = await fetchTextImpl(source.url, { headers: { accept: "text/html" } });
-    return extractLinks(html, source.url, source.linkPattern, source.limit).map((entry) =>
-      toRaw(source, { ...entry, title: entry.title.slice(0, 60), summary: entry.title }),
+    return extractLinks(html, source.url, source.linkPattern, source.limit).map((entry, index) =>
+      toRaw(source, { ...entry, title: entry.title.slice(0, 60), summary: entry.title }, index),
     );
   }
 
