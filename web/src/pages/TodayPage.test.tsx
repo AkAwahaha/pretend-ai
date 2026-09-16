@@ -29,6 +29,7 @@ describe("TodayPage", () => {
   it("按主题筛选内容", () => {
     renderTodayPage();
 
+    fireEvent.click(screen.getByRole("button", { name: "筛选分类" }));
     fireEvent.click(screen.getByRole("tab", { name: "开源开发者生态" }));
 
     expect(screen.getByText("agent-memory：给 Agent 加一层长期记忆")).toBeInTheDocument();

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
@@ -17,6 +18,7 @@ interface TodayPageProps {
 
 export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack }: TodayPageProps) {
   const [category, setCategory] = useState<Category>("全部");
+  const [showFilters, setShowFilters] = useState(false);
 
   const items = useMemo(
     () => (category === "全部" ? digest.items : digest.items.filter((item) => item.category === category)),
@@ -37,15 +39,39 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
         </header>
 
         <section className="hero">
-          <div className="hero__orb" aria-hidden="true" />
-          <p className="hero__kicker">{digest.kicker}</p>
-          <h1 className="hero__title">{digest.headline}</h1>
-          <p className="hero__meta">
-            {digest.items.length} 条内容 · 5 分钟读完 · 用产品视野看 AI
-          </p>
+          <div className="hero__main">
+            <div className="hero__text">
+              <p className="hero__kicker">{digest.kicker}</p>
+              <h1 className="hero__title">{digest.headline}</h1>
+            </div>
+            <div className="hero__orb" aria-hidden="true" />
+          </div>
+          <p className="hero__meta">用产品视野看 AI · 每日更新</p>
         </section>
 
-        <FilterChips value={category} onChange={setCategory} />
+        <div className="filter-bar">
+          <button
+            type="button"
+            className={category === "全部" ? "filter-toggle" : "filter-toggle filter-toggle--active"}
+            aria-expanded={showFilters}
+            aria-label="筛选分类"
+            onClick={() => setShowFilters((value) => !value)}
+          >
+            <SlidersHorizontal size={14} />
+            {category === "全部" ? "筛选" : category}
+          </button>
+          <span className="section__count">共 {items.length} 条</span>
+        </div>
+
+        {showFilters ? (
+          <FilterChips
+            value={category}
+            onChange={(next) => {
+              setCategory(next);
+              setShowFilters(false);
+            }}
+          />
+        ) : null}
 
         <section className="section">
           <h2 className="section__title">

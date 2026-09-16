@@ -1,16 +1,16 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { DetailPage } from "./pages/DetailPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { TodayPage } from "./pages/TodayPage";
 import { ALL_ITEMS, findDigest } from "./data/mock";
-import type { DigestItem } from "./types";
 import { useArchive } from "./hooks/useArchive";
 import { useDayDigest } from "./hooks/useDayDigest";
 import { useDigest } from "./hooks/useDigest";
 import { useFavorites } from "./hooks/useFavorites";
 import { useHashRoute } from "./hooks/useHashRoute";
 import { navigate } from "./router";
+import type { DigestItem } from "./types";
 
 export function App() {
   const route = useHashRoute();
@@ -18,6 +18,7 @@ export function App() {
   const { digest } = useDigest();
   const { entries, status: archiveStatus } = useArchive();
   const archived = useDayDigest(route.name === "day" ? route.date : undefined);
+  const [navIds, setNavIds] = useState<string[]>([]);
 
   const itemPool = useMemo(() => {
     const byId = new Map<string, DigestItem>();
@@ -41,7 +42,10 @@ export function App() {
   );
 
   const goToday = () => navigate("/today");
-  const openItem = (id: string) => navigate(`/item/${id}`);
+  const openItem = (id: string, list: DigestItem[]) => {
+    setNavIds(list.map((entry) => entry.id));
+    navigate(`/item/${id}`);
+  };
 
   if (route.name === "item") {
     const item = itemPool.find((entry) => entry.id === route.id);
@@ -52,6 +56,8 @@ export function App() {
           favorite={isFavorite(item.id)}
           onToggleFavorite={toggle}
           onBack={goToday}
+          navIds={navIds}
+          onNavigate={(id) => navigate(`/item/${id}`)}
         />
       );
     }
@@ -63,7 +69,7 @@ export function App() {
         items={favoriteItems}
         isFavorite={isFavorite}
         onToggleFavorite={toggle}
-        onOpen={openItem}
+        onOpen={(id) => openItem(id, favoriteItems)}
         onBack={goToday}
       />
     );
@@ -81,14 +87,14 @@ export function App() {
   }
 
   if (route.name === "day") {
-    const digest = archived ?? findDigest(route.date);
-    if (digest) {
+    const dayDigest = archived ?? findDigest(route.date);
+    if (dayDigest) {
       return (
         <TodayPage
-          digest={digest}
+          digest={dayDigest}
           isFavorite={isFavorite}
           onToggleFavorite={toggle}
-          onOpen={openItem}
+          onOpen={(id) => openItem(id, dayDigest.items)}
           onBack={goToday}
         />
       );
@@ -100,7 +106,7 @@ export function App() {
       digest={digest}
       isFavorite={isFavorite}
       onToggleFavorite={toggle}
-      onOpen={openItem}
+      onOpen={(id) => openItem(id, digest.items)}
     />
   );
 }
