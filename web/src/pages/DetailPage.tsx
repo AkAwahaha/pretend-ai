@@ -1,11 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TouchEvent } from "react";
-import { ArrowUpRight, Bookmark, ChevronLeft, ChevronRight, Download, Flame } from "lucide-react";
+import {
+  ArrowUpRight,
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  FileDown,
+  Flame,
+  Loader2,
+} from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
 import { SourceTag } from "../components/SourceTag";
 import { ThreeQuestionCard } from "../components/ThreeQuestionCard";
 import { TopBar } from "../components/TopBar";
 import { dateFromItemId, downloadMarkdown, itemFileName, itemToMarkdown } from "../lib/markdown";
+import {
+  describeObsidianError,
+  getObsidianKey,
+  saveToObsidian,
+  setObsidianKey,
+  testObsidianConnection,
+} from "../lib/obsidian";
 import type { DigestItem } from "../types";
 
 interface DetailPageProps {
@@ -38,10 +54,18 @@ export function DetailPage({
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [imageFailed, setImageFailed] = useState(false);
+  const [obsidianState, setObsidianState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [obsidianMessage, setObsidianMessage] = useState("");
+  const [showKeyPanel, setShowKeyPanel] = useState(false);
+  const [keyInput, setKeyInput] = useState("");
 
   const index = navIds.indexOf(item.id);
   const prevId = index > 0 ? navIds[index - 1] : undefined;
   const nextId = index >= 0 && index < navIds.length - 1 ? navIds[index + 1] : undefined;
+
+  const date = dateFromItemId(item.id);
+  const fileName = itemFileName(item, date);
+  const markdown = itemToMarkdown(item, date);
 
   const applyDrag = useCallback((delta: number) => {
     const panel = panelRef.current;
@@ -109,6 +133,11 @@ export function DetailPage({
     return () => window.removeEventListener("scroll", onScroll);
   }, [item.id]);
 
+  useEffect(() => {
+    setObsidianState("idle");
+    setObsidianMessage("");
+  }, [item.id]);
+
   useEffect(
     () => () => {
       if (rafRef.current !== null) {
@@ -171,6 +200,40 @@ export function DetailPage({
       return;
     }
     resetDrag();
+  };
+
+  const handleSaveToObsidian = async () => {
+    if (!getObsidianKey()) {
+      setShowKeyPanel(true);
+      return;
+    }
+    setObsidianState("saving");
+    setObsidianMessage("");
+    try {
+      const path = await saveToObsidian(fileName, markdown);
+      setObsidianState("saved");
+      setObsidianMessage(`已存入 ${path}`);
+    } catch (error) {
+      setObsidianState("error");
+      setObsidianMessage(describeObsidianError(error));
+    }
+  };
+
+  const handleSaveKey = async () => {
+    const key = keyInput.trim();
+    if (!key) {
+      return;
+    }
+    setObsidianKey(key);
+    try {
+      await testObsidianConnection(key);
+      setShowKeyPanel(false);
+      setObsidianState("saved");
+      setObsidianMessage("连接成功，再点一次就能存入");
+    } catch (error) {
+      setObsidianState("error");
+      setObsidianMessage(describeObsidianError(error));
+    }
   };
 
   const showImage = Boolean(item.image) && !imageFailed;
@@ -245,15 +308,52 @@ export function DetailPage({
                 type="button"
                 className="obsidian-btn"
                 aria-label="存入 Obsidian"
-                title="存入 Obsidian"
-                onClick={() => {
-                  const date = dateFromItemId(item.id);
-                  downloadMarkdown(itemFileName(item, date), itemToMarkdown(item, date));
-                }}
+                title="存入 Obsidian 的 raw 文件夹"
+                disabled={obsidianState === "saving"}
+                onClick={handleSaveToObsidian}
+              >
+                {obsidianState === "saving" ? <Loader2 size={16} className="spin" /> : <FileDown size={16} />}
+              </button>
+              <button
+                type="button"
+                className="obsidian-btn"
+                aria-label="下载 Markdown 文件"
+                title="下载 Markdown 文件"
+                onClick={() => downloadMarkdown(fileName, markdown)}
               >
                 <Download size={16} />
               </button>
             </div>
+
+            {obsidianMessage ? (
+              <p className={obsidianState === "error" ? "obsidian-status obsidian-status--error" : "obsidian-status"}>
+                {obsidianMessage}
+              </p>
+            ) : null}
+
+            {showKeyPanel ? (
+              <div className="obsidian-panel">
+                <p className="obsidian-panel__title">填入 Obsidian API Key</p>
+                <p className="obsidian-panel__hint">
+                  在 Obsidian 里打开「设置 → Local REST API」复制 API Key，粘贴到下面。它只保存在这台设备的浏览器里，不会上传。
+                </p>
+                <input
+                  className="obsidian-panel__input"
+                  type="password"
+                  placeholder="粘贴 API Key"
+                  value={keyInput}
+                  onChange={(event) => setKeyInput(event.target.value)}
+                />
+                <div className="obsidian-panel__actions">
+                  <button type="button" className="btn-primary" onClick={handleSaveKey}>
+                    保存并测试连接
+                  </button>
+                  <button type="button" className="btn-ghost" onClick={() => setShowKeyPanel(false)}>
+                    取消
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             <ThreeQuestionCard item={item} />
 
