@@ -47,7 +47,7 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
             </div>
             <BrandMark />
           </div>
-          <p className="hero__meta">用产品视野看 AI · 每日更新</p>
+          <p className="hero__meta">用产品视野看 AI · 每日更新 · v1.3</p>
         </section>
 
         <div className="filter-bar">
