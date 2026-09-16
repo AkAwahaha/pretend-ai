@@ -34,15 +34,9 @@ export interface DigestItem {
   productView: string;
   sourceUrl: string;
   readTime: string;
-  terms?: Term[];
   heat?: number;
   image?: string;
   featured: boolean;
-}
-
-export interface Term {
-  term: string;
-  explain: string;
 }
 
 export interface SearchEntry {

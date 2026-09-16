@@ -17,11 +17,20 @@ interface TodayPageProps {
   isFavorite: (id: string) => boolean;
   getMastery: (id: string) => MasteryState | null;
   onToggleFavorite: (id: string) => void;
+  onSetMastery?: (id: string, state: MasteryState) => void;
   onOpen: (id: string) => void;
   onBack?: () => void;
 }
 
-export function TodayPage({ digest, isFavorite, getMastery, onToggleFavorite, onOpen, onBack }: TodayPageProps) {
+export function TodayPage({
+  digest,
+  isFavorite,
+  getMastery,
+  onToggleFavorite,
+  onSetMastery,
+  onOpen,
+  onBack,
+}: TodayPageProps) {
   const [category, setCategory] = useState<Category>("全部");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -146,7 +155,9 @@ export function TodayPage({ digest, isFavorite, getMastery, onToggleFavorite, on
                 index={index}
                 item={item}
                 favorite={isFavorite(item.id)}
+                mastery={getMastery(item.id)}
                 onToggleFavorite={onToggleFavorite}
+                onSetMastery={onSetMastery}
                 onOpen={onOpen}
               />
             ))}

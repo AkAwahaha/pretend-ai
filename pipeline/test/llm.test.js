@@ -6,7 +6,6 @@ import {
   extractJson,
   getLlmConfig,
   normalizeTakeaways,
-  normalizeTerms,
   normalizeTopic,
   summarizeItem,
   summarizeMainline,
@@ -74,25 +73,6 @@ describe("normalizeTopic", () => {
   it("把未知分类兜底为模型技术快讯", () => {
     assert.equal(normalizeTopic("随便写的分类"), "模型技术快讯");
     assert.equal(normalizeTopic(""), "模型技术快讯");
-  });
-});
-
-describe("normalizeTerms", () => {
-  it("保留合法术语并最多取 3 个", () => {
-    const terms = normalizeTerms([
-      { term: "MoE", explain: "混合专家模型" },
-      { term: "蒸馏", explain: "用大模型教小模型" },
-      { term: "量化", explain: "降低数值精度" },
-      { term: "多余", explain: "会被截断" },
-    ]);
-    assert.equal(terms.length, 3);
-    assert.deepEqual(terms[0], { term: "MoE", explain: "混合专家模型" });
-  });
-
-  it("非法输入返回空数组", () => {
-    assert.deepEqual(normalizeTerms(undefined), []);
-    assert.deepEqual(normalizeTerms("MoE"), []);
-    assert.deepEqual(normalizeTerms([{ term: "", explain: "x" }]), []);
   });
 });
 

@@ -5,6 +5,7 @@ import { TodayPage } from "./TodayPage";
 
 function renderTodayPage() {
   const onToggleFavorite = vi.fn();
+  const onSetMastery = vi.fn();
   const onOpen = vi.fn();
   render(
     <TodayPage
@@ -12,10 +13,11 @@ function renderTodayPage() {
       isFavorite={() => false}
       getMastery={() => null}
       onToggleFavorite={onToggleFavorite}
+      onSetMastery={onSetMastery}
       onOpen={onOpen}
     />,
   );
-  return { onToggleFavorite, onOpen };
+  return { onToggleFavorite, onSetMastery, onOpen };
 }
 
 describe("TodayPage", () => {
@@ -43,5 +45,25 @@ describe("TodayPage", () => {
     fireEvent.click(screen.getByText(TODAY_DIGEST.items[0].title));
 
     expect(onOpen).toHaveBeenCalledWith(TODAY_DIGEST.items[0].id);
+  });
+
+  it("显示掌握按钮并把状态回传给页面", () => {
+    const first = TODAY_DIGEST.items[0];
+    const onSetMastery = vi.fn();
+    render(
+      <TodayPage
+        digest={TODAY_DIGEST}
+        isFavorite={() => false}
+        getMastery={(id) => (id === first.id ? "mastered" : null)}
+        onToggleFavorite={vi.fn()}
+        onSetMastery={onSetMastery}
+        onOpen={vi.fn()}
+      />,
+    );
+
+    const doneButton = screen.getByRole("button", { name: `将「${first.title}」标记为已掌握` });
+    expect(doneButton).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: `将「${first.title}」标记为未掌握` }));
+    expect(onSetMastery).toHaveBeenCalledWith(first.id, "unmastered");
   });
 });

@@ -2,17 +2,28 @@ import { ItemCard } from "../components/ItemCard";
 import { GlowBackground } from "../components/GlowBackground";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
+import type { MasteryState } from "../hooks/useMastery";
 import type { DigestItem } from "../types";
 
 interface FavoritesPageProps {
   items: DigestItem[];
   isFavorite: (id: string) => boolean;
+  getMastery: (id: string) => MasteryState | null;
   onToggleFavorite: (id: string) => void;
+  onSetMastery: (id: string, state: MasteryState) => void;
   onOpen: (id: string) => void;
   onBack: () => void;
 }
 
-export function FavoritesPage({ items, isFavorite, onToggleFavorite, onOpen, onBack }: FavoritesPageProps) {
+export function FavoritesPage({
+  items,
+  isFavorite,
+  getMastery,
+  onToggleFavorite,
+  onSetMastery,
+  onOpen,
+  onBack,
+}: FavoritesPageProps) {
   return (
     <div className="frame">
       <GlowBackground />
@@ -28,7 +39,9 @@ export function FavoritesPage({ items, isFavorite, onToggleFavorite, onOpen, onB
                 key={item.id}
                 item={item}
                 favorite={isFavorite(item.id)}
+                mastery={getMastery(item.id)}
                 onToggleFavorite={onToggleFavorite}
+                onSetMastery={onSetMastery}
                 onOpen={onOpen}
               />
             ))}

@@ -298,7 +298,6 @@ export function buildDigest({ date, selected, cards, mainline = "", takeaways = 
       sourceUrl: item.url,
       image: item.image ?? "",
       readTime: cards[index].readTime,
-      terms: cards[index].terms ?? [],
       title: cards[index].title,
       summary: cards[index].summary,
       what: cards[index].what,

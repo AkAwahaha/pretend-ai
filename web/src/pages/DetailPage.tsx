@@ -11,7 +11,6 @@ import {
   Download,
   FileDown,
   Flame,
-  BookMarked,
   Loader2,
 } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
@@ -321,6 +320,38 @@ export function DetailPage({
             <div className="detail-quote">
               <p>{item.summary}</p>
             </div>
+            {onSetMastery ? (
+              <div className="mastery-block">
+                <p className="mastery-block__label">这条掌握了吗？</p>
+                <div className="mastery-actions">
+                  <button
+                    type="button"
+                    className={mastery === "mastered" ? "mastery-btn mastery-btn--done" : "mastery-btn"}
+                    aria-pressed={mastery === "mastered"}
+                    onClick={() => onSetMastery(item.id, "mastered")}
+                  >
+                    <CheckCircle2 size={15} />
+                    已掌握
+                  </button>
+                  <button
+                    type="button"
+                    className={mastery === "unmastered" ? "mastery-btn mastery-btn--todo" : "mastery-btn"}
+                    aria-pressed={mastery === "unmastered"}
+                    onClick={() => onSetMastery(item.id, "unmastered")}
+                  >
+                    <CircleDot size={15} />
+                    未掌握
+                  </button>
+                </div>
+                {mastery ? (
+                  <p className={`mastery-status mastery-status--${mastery}`}>
+                    {mastery === "mastered"
+                      ? "已掌握：首页进度会更新，且不会进入复习列表"
+                      : "未掌握：已加入复习列表，下次可以从首页继续"}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="detail-actions">
               <a className="read-original" href={item.sourceUrl} target="_blank" rel="noreferrer">
@@ -385,45 +416,7 @@ export function DetailPage({
 
             <ThreeQuestionCard item={item} />
 
-            {onSetMastery ? (
-              <div className="mastery-actions">
-                <button
-                  type="button"
-                  className={mastery === "mastered" ? "mastery-btn mastery-btn--done" : "mastery-btn"}
-                  aria-pressed={mastery === "mastered"}
-                  onClick={() => onSetMastery(item.id, "mastered")}
-                >
-                  <CheckCircle2 size={15} />
-                  已掌握
-                </button>
-                <button
-                  type="button"
-                  className={mastery === "unmastered" ? "mastery-btn mastery-btn--todo" : "mastery-btn"}
-                  aria-pressed={mastery === "unmastered"}
-                  onClick={() => onSetMastery(item.id, "unmastered")}
-                >
-                  <CircleDot size={15} />
-                  未掌握
-                </button>
-              </div>
-            ) : null}
 
-            {item.terms && item.terms.length > 0 ? (
-              <section className="terms">
-                <h2 className="terms__title">
-                  <BookMarked size={15} />
-                  关键术语
-                </h2>
-                <dl className="terms__list">
-                  {item.terms.map((entry) => (
-                    <div className="terms__item" key={entry.term}>
-                      <dt className="terms__term">{entry.term}</dt>
-                      <dd className="terms__explain">{entry.explain}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
-            ) : null}
 
             <a className="source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
               {item.sourceUrl}

@@ -12,14 +12,24 @@ interface ItemCardProps {
   onOpen: (id: string) => void;
   index?: number;
   mastery?: MasteryState | null;
+  onSetMastery?: (id: string, state: MasteryState) => void;
 }
 
-export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0, mastery = null }: ItemCardProps) {
+export function ItemCard({
+  item,
+  favorite,
+  onToggleFavorite,
+  onOpen,
+  index = 0,
+  mastery = null,
+  onSetMastery,
+}: ItemCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const showImage = Boolean(item.image) && !imageFailed;
+  const masteryClass = mastery ? ` item-card--${mastery}` : "";
 
   return (
-    <article className="item-card" style={{ "--index": index } as CSSProperties}>
+    <article className={`item-card${masteryClass}`} style={{ "--index": index } as CSSProperties}>
       <div className="item-card__head">
         <div className="item-card__tags">
           <SourceTag source={item.source} label={item.sourceLabel} />
@@ -80,6 +90,36 @@ export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0, 
         <span className="topic-chip">{item.category}</span>
         <span className="item-card__time">{item.readTime}</span>
       </div>
+
+      {onSetMastery ? (
+        <div className="item-card__mastery">
+          <span className="item-card__mastery-label">
+            {mastery === "mastered" ? "已加入掌握" : mastery === "unmastered" ? "待复习" : "这条掌握了吗？"}
+          </span>
+          <div className="item-card__mastery-actions">
+            <button
+              type="button"
+              className={mastery === "mastered" ? "card-mastery-btn card-mastery-btn--done" : "card-mastery-btn"}
+              aria-label={`将「${item.title}」标记为已掌握`}
+              aria-pressed={mastery === "mastered"}
+              onClick={() => onSetMastery(item.id, "mastered")}
+            >
+              <Check size={13} />
+              已掌握
+            </button>
+            <button
+              type="button"
+              className={mastery === "unmastered" ? "card-mastery-btn card-mastery-btn--todo" : "card-mastery-btn"}
+              aria-label={`将「${item.title}」标记为未掌握`}
+              aria-pressed={mastery === "unmastered"}
+              onClick={() => onSetMastery(item.id, "unmastered")}
+            >
+              <CircleDot size={13} />
+              未掌握
+            </button>
+          </div>
+        </div>
+      ) : null}
     </article>
   );
 }

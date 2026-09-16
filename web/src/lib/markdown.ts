@@ -59,9 +59,6 @@ export function itemToMarkdown(item: DigestItem, date: string): string {
     "",
     item.productView,
     "",
-    ...(item.terms && item.terms.length > 0
-      ? ["## 关键术语", "", ...item.terms.map((entry) => `- **${entry.term}**：${entry.explain}`), ""]
-      : []),
     `[阅读原文](${item.sourceUrl})`,
     "",
     "---",
@@ -91,9 +88,6 @@ export function digestToMarkdown(digest: DailyDigest): string {
       "",
       item.productView,
       "",
-      ...(item.terms && item.terms.length > 0
-        ? ["### 关键术语", "", ...item.terms.map((entry) => `- **${entry.term}**：${entry.explain}`), ""]
-        : []),
       `[阅读原文](${item.sourceUrl})`,
       "",
       "---",

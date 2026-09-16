@@ -26,8 +26,7 @@ export function buildPrompt(item) {
     "把一条 AI 资讯或开源项目，整理成可以直接用于面试准备的结构化卡片。",
     "要求：所有字段必须用简体中文输出；不堆砌形容词；说清楚它解决了什么问题、亮点和实现思路在哪、产品经理应该怎么理解。",
     "英文原文必须翻译成中文；只有公司名、产品名、模型名和开源仓库名可以保留英文，且必须放在中文语境里，不得出现整句英文。",
-    "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime, topic, terms}。",
-    "terms 是这条内容里非技术背景的人可能看不懂的术语，0-3 个，每个包含 term（术语原文）和 explain（一句话解释）。没有就返回空数组。",
+    "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime, topic}。",
     "topic 必须从以下分类里选最贴切的一个：模型技术快讯 / 商业资本动态 / 算力硬件上游 / 行业应用落地 / 政策监管治理 / 开源开发者生态 / 深度观点与趋势分析。",
     "title 用中文概括；开源项目保留 owner/repo，其余英文标题必须翻译。",
     "readTime 用「X 分钟」格式。",
@@ -65,23 +64,6 @@ export function normalizeReadTime(value) {
     return "2 分钟";
   }
   return match[1] + " 分钟";
-}
-
-export function normalizeTerms(value) {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value
-    .filter(
-      (entry) =>
-        entry &&
-        typeof entry.term === "string" &&
-        typeof entry.explain === "string" &&
-        entry.term.trim().length > 0 &&
-        entry.explain.trim().length > 0,
-    )
-    .map((entry) => ({ term: entry.term.trim(), explain: entry.explain.trim() }))
-    .slice(0, 3);
 }
 
 export function normalizeTopic(value) {
@@ -181,7 +163,6 @@ export async function summarizeItem(item, { config, postJsonImpl = postJson, ret
         productView: parsed.productView.trim(),
         readTime: normalizeReadTime(parsed.readTime),
         topic: normalizeTopic(parsed.topic),
-        terms: normalizeTerms(parsed.terms),
       };
     } catch (error) {
       lastError = error;

@@ -81,7 +81,9 @@ export function App() {
       <FavoritesPage
         items={favoriteItems}
         isFavorite={isFavorite}
+        getMastery={getMastery}
         onToggleFavorite={toggle}
+        onSetMastery={setMastery}
         onOpen={(id) => openItem(id, favoriteItems)}
         onBack={goToday}
       />
@@ -110,6 +112,7 @@ export function App() {
           isFavorite={isFavorite}
           getMastery={getMastery}
           onToggleFavorite={toggle}
+          onSetMastery={setMastery}
           onOpen={(id) => openItem(id, dayDigest.items)}
           onBack={goToday}
         />
@@ -123,6 +126,7 @@ export function App() {
       isFavorite={isFavorite}
       getMastery={getMastery}
       onToggleFavorite={toggle}
+      onSetMastery={setMastery}
       onOpen={(id) => openItem(id, digest.items)}
     />
   );
