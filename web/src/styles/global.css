@@ -1417,3 +1417,74 @@ a {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+/* ===== 阅读进度 ===== */
+
+.item-card__tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.read-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.read-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.read-progress__bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--neutral-fill);
+  overflow: hidden;
+}
+
+.read-progress__bar span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: var(--brand);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.read-progress__label {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.continue-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  transition: background var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+.continue-btn:hover {
+  background: #e3e7fa;
+}
+
+.continue-btn:active {
+  transform: scale(0.99);
+}

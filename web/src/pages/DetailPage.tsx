@@ -35,6 +35,7 @@ interface DetailPageProps {
   onBack: () => void;
   navIds?: string[];
   onNavigate?: (id: string) => void;
+  onRead?: (id: string) => void;
 }
 
 const MAX_DRAG = 200;
@@ -47,6 +48,7 @@ export function DetailPage({
   onBack,
   navIds = [],
   onNavigate,
+  onRead,
 }: DetailPageProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const touchStartX = useRef<number | null>(null);
@@ -136,6 +138,10 @@ export function DetailPage({
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, [item.id]);
+
+  useEffect(() => {
+    onRead?.(item.id);
+  }, [item.id, onRead]);
 
   useEffect(() => {
     setObsidianState("idle");

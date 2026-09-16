@@ -9,6 +9,7 @@ import { useDayDigest } from "./hooks/useDayDigest";
 import { useDigest } from "./hooks/useDigest";
 import { useFavorites } from "./hooks/useFavorites";
 import { useHashRoute } from "./hooks/useHashRoute";
+import { useReadItems } from "./hooks/useReadItems";
 import { useSearchIndex } from "./hooks/useSearchIndex";
 import { navigate } from "./router";
 import { dateFromItemId } from "./lib/markdown";
@@ -17,6 +18,7 @@ import type { DigestItem } from "./types";
 export function App() {
   const route = useHashRoute();
   const { ids, toggle, isFavorite } = useFavorites();
+  const { isRead, markRead } = useReadItems();
   const { digest } = useDigest();
   const { entries, status: archiveStatus } = useArchive();
   const archiveDate =
@@ -65,6 +67,7 @@ export function App() {
           favorite={isFavorite(item.id)}
           onToggleFavorite={toggle}
           onBack={goToday}
+          onRead={markRead}
           navIds={navIds}
           onNavigate={(id) => navigate(`/item/${id}`)}
         />
@@ -104,6 +107,7 @@ export function App() {
         <TodayPage
           digest={dayDigest}
           isFavorite={isFavorite}
+          isRead={isRead}
           onToggleFavorite={toggle}
           onOpen={(id) => openItem(id, dayDigest.items)}
           onBack={goToday}
@@ -116,6 +120,7 @@ export function App() {
     <TodayPage
       digest={digest}
       isFavorite={isFavorite}
+      isRead={isRead}
       onToggleFavorite={toggle}
       onOpen={(id) => openItem(id, digest.items)}
     />

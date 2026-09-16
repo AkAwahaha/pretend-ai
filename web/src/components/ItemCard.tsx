@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { CSSProperties } from "react";
-import { Bookmark, Flame } from "lucide-react";
+import { Bookmark, Check, Flame } from "lucide-react";
 import type { DigestItem } from "../types";
 import { SourceTag } from "./SourceTag";
 
@@ -10,16 +10,25 @@ interface ItemCardProps {
   onToggleFavorite: (id: string) => void;
   onOpen: (id: string) => void;
   index?: number;
+  read?: boolean;
 }
 
-export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0 }: ItemCardProps) {
+export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0, read = false }: ItemCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const showImage = Boolean(item.image) && !imageFailed;
 
   return (
     <article className="item-card" style={{ "--index": index } as CSSProperties}>
       <div className="item-card__head">
-        <SourceTag source={item.source} label={item.sourceLabel} />
+        <div className="item-card__tags">
+          <SourceTag source={item.source} label={item.sourceLabel} />
+          {read ? (
+            <span className="read-badge">
+              <Check size={11} />
+              已读
+            </span>
+          ) : null}
+        </div>
         <div className="item-card__actions">
           {item.heat ? (
             <span className="heat-badge" title="热度">

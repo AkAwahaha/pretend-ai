@@ -10,6 +10,7 @@ function renderTodayPage() {
     <TodayPage
       digest={TODAY_DIGEST}
       isFavorite={() => false}
+      isRead={() => false}
       onToggleFavorite={onToggleFavorite}
       onOpen={onOpen}
     />,

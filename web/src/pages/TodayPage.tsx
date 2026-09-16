@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CheckCircle2, Compass, Download, SlidersHorizontal } from "lucide-react";
+import { CheckCircle2, Compass, Download, Play, SlidersHorizontal } from "lucide-react";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
@@ -14,15 +14,17 @@ const BUILD_ID = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 interface TodayPageProps {
   digest: DailyDigest;
   isFavorite: (id: string) => boolean;
+  isRead: (id: string) => boolean;
   onToggleFavorite: (id: string) => void;
   onOpen: (id: string) => void;
   onBack?: () => void;
 }
 
-export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack }: TodayPageProps) {
+export function TodayPage({ digest, isFavorite, isRead, onToggleFavorite, onOpen, onBack }: TodayPageProps) {
   const [category, setCategory] = useState<Category>("全部");
   const [showFilters, setShowFilters] = useState(false);
 
+  const readCount = digest.items.filter((item) => isRead(item.id)).length;
   const items = useMemo(
     () => (category === "全部" ? digest.items : digest.items.filter((item) => item.category === category)),
     [digest.items, category],
@@ -101,6 +103,35 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
           <h2 className="section__title">
             今日 {items.length} 条 <span className="section__count">按热度排序</span>
           </h2>
+          {category === "全部" ? (
+            <div className="read-progress">
+              <div className="read-progress__bar">
+                <span
+                  style={{
+                    transform: `scaleX(${digest.items.length > 0 ? readCount / digest.items.length : 0})`,
+                  }}
+                />
+              </div>
+              <span className="read-progress__label">
+                已读 {readCount}/{digest.items.length}
+              </span>
+            </div>
+          ) : null}
+          {category === "全部" && readCount < digest.items.length ? (
+            <button
+              type="button"
+              className="continue-btn"
+              onClick={() => {
+                const next = digest.items.find((item) => !isRead(item.id));
+                if (next) {
+                  onOpen(next.id);
+                }
+              }}
+            >
+              <Play size={14} />
+              继续阅读 · 还有 {digest.items.length - readCount} 条未读
+            </button>
+          ) : null}
           <div className="stack">
             {items.map((item, index) => (
               <ItemCard
