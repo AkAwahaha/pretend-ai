@@ -9,7 +9,9 @@ import { useDayDigest } from "./hooks/useDayDigest";
 import { useDigest } from "./hooks/useDigest";
 import { useFavorites } from "./hooks/useFavorites";
 import { useHashRoute } from "./hooks/useHashRoute";
+import { useSearchIndex } from "./hooks/useSearchIndex";
 import { navigate } from "./router";
+import { dateFromItemId } from "./lib/markdown";
 import type { DigestItem } from "./types";
 
 export function App() {
@@ -17,8 +19,15 @@ export function App() {
   const { ids, toggle, isFavorite } = useFavorites();
   const { digest } = useDigest();
   const { entries, status: archiveStatus } = useArchive();
-  const archived = useDayDigest(route.name === "day" ? route.date : undefined);
+  const archiveDate =
+    route.name === "day"
+      ? route.date
+      : route.name === "item"
+        ? dateFromItemId(route.id)
+        : undefined;
+  const archived = useDayDigest(archiveDate);
   const [navIds, setNavIds] = useState<string[]>([]);
+  const { entries: searchEntries } = useSearchIndex();
 
   const itemPool = useMemo(() => {
     const byId = new Map<string, DigestItem>();
@@ -42,7 +51,7 @@ export function App() {
   );
 
   const goToday = () => navigate("/today");
-  const openItem = (id: string, list: DigestItem[]) => {
+  const openItem = (id: string, list: Array<{ id: string }>) => {
     setNavIds(list.map((entry) => entry.id));
     navigate(`/item/${id}`);
   };
@@ -80,7 +89,9 @@ export function App() {
       <HistoryPage
         entries={entries}
         status={archiveStatus}
+        searchEntries={searchEntries}
         onOpenDay={(date) => navigate(`/day/${date}`)}
+        onOpenItem={(id) => openItem(id, searchEntries)}
         onBack={goToday}
       />
     );

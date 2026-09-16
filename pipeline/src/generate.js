@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { SOURCES, fetchSource } from "./sources.js";
 
@@ -279,10 +279,11 @@ export function createItemId(item, date, index) {
   return item.sourceKey + "-" + date + "-" + index;
 }
 
-export function buildDigest({ date, selected, cards, mainline = "" }) {
+export function buildDigest({ date, selected, cards, mainline = "", takeaways = [] }) {
   return {
     date,
     mainline,
+    takeaways,
     label: date.slice(5).replace("-", "."),
     headline: "今日 AI 日报",
     kicker: "DAILY BRIEF",
@@ -336,4 +337,51 @@ export async function writeDigest(digest, { outDir }) {
   const next = [entry, ...index.filter((item) => item?.date !== digest.date)].slice(0, 90);
 
   await writeJson(indexPath, next);
+  await rebuildSearchIndex(outDir, digest.date);
+}
+
+export async function rebuildSearchIndex(outDir, latestDate) {
+  const archiveDir = path.join(outDir, "archive");
+  let files = [];
+  try {
+    files = await readdir(archiveDir);
+  } catch {
+    files = [];
+  }
+
+  const dates = files
+    .filter((name) => name.endsWith(".json"))
+    .map((name) => name.replace(/\.json$/, ""))
+    .sort()
+    .reverse()
+    .slice(0, 60);
+
+  const entries = [];
+  for (const date of dates) {
+    try {
+      const digest = JSON.parse(await readFile(path.join(archiveDir, date + ".json"), "utf8"));
+      for (const item of digest.items ?? []) {
+        entries.push({
+          id: item.id,
+          date: digest.date ?? date,
+          sourceKey: item.source ?? "",
+          title: item.title ?? "",
+          summary: item.summary ?? "",
+          category: item.category ?? "",
+          source: item.sourceLabel ?? "",
+          heat: Number(item.heat ?? 0),
+          url: item.sourceUrl ?? "",
+        });
+      }
+    } catch {
+      // 跳过无法解析的归档
+    }
+  }
+
+  if (latestDate && !entries.some((entry) => entry.date === latestDate)) {
+    // 最新一期尚未写入归档时忽略
+  }
+
+  await writeJson(path.join(outDir, "search-index.json"), entries);
+  return entries;
 }

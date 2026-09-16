@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDigest, collectRawItems, dedupe, scoreItems, selectItems, writeDigest } from "./generate.js";
 import { enrichImages } from "./images.js";
-import { getLlmConfig, summarizeItem, summarizeMainline } from "./llm.js";
+import { getLlmConfig, summarizeItem, summarizeMainline, summarizeTakeaways } from "./llm.js";
 import { itemKey, loadSeen, saveSeen, splitFresh } from "./seen.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -145,7 +145,15 @@ try {
   console.warn("主线生成失败，已跳过：" + error.message);
 }
 
-const digest = buildDigest({ date, selected, cards, mainline });
+let takeaways = [];
+try {
+  takeaways = await summarizeTakeaways(cards, { config });
+  console.log("今日收获：" + takeaways.join(" / "));
+} catch (error) {
+  console.warn("收获生成失败，已跳过：" + error.message);
+}
+
+const digest = buildDigest({ date, selected, cards, mainline, takeaways });
 await writeDigest(digest, { outDir });
 
 for (const item of selected) {

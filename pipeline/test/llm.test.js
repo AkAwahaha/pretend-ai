@@ -5,10 +5,12 @@ import {
   buildPrompt,
   extractJson,
   getLlmConfig,
+  normalizeTakeaways,
   normalizeTerms,
   normalizeTopic,
   summarizeItem,
   summarizeMainline,
+  summarizeTakeaways,
   validateCard,
 } from "../src/llm.js";
 
@@ -115,6 +117,32 @@ describe("summarizeMainline", () => {
       postJsonImpl,
     });
     assert.equal(text, "被引号包住的主线");
+  });
+});
+
+describe("normalizeTakeaways", () => {
+  it("只保留非空字符串并最多取 3 条", () => {
+    const result = normalizeTakeaways(["a", "  ", "b", "c", "d"]);
+    assert.deepEqual(result, ["a", "b", "c"]);
+  });
+
+  it("非数组返回空", () => {
+    assert.deepEqual(normalizeTakeaways(undefined), []);
+    assert.deepEqual(normalizeTakeaways({ takeaways: ["a"] }), []);
+  });
+});
+
+describe("summarizeTakeaways", () => {
+  it("解析模型返回的 JSON", async () => {
+    const postJsonImpl = async () => ({
+      choices: [{ message: { content: '{"takeaways":["收获一","收获二","收获三"]}' } }],
+    });
+    const result = await summarizeTakeaways([{ topic: "t", title: "T", summary: "S" }], {
+      config: { apiKey: "test", baseUrl: "https://api.test/v1", model: "m" },
+      postJsonImpl,
+    });
+    assert.equal(result.length, 3);
+    assert.equal(result[0], "收获一");
   });
 });
 

@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
-import { buildDigest, dedupe, scoreItems, selectItems, writeDigest } from "../src/generate.js";
+import { buildDigest, dedupe, rebuildSearchIndex, scoreItems, selectItems, writeDigest } from "../src/generate.js";
 
 function sample(overrides = {}) {
   return {
@@ -98,6 +98,38 @@ describe("scoreItems", () => {
 
   it("空数组不会报错", () => {
     assert.deepEqual(scoreItems([]), []);
+  });
+});
+
+describe("rebuildSearchIndex", () => {
+  it("把归档拼成搜索索引", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "pretend-ai-search-"));
+    const archiveDir = path.join(dir, "archive");
+    await mkdir(archiveDir, { recursive: true });
+    const digest = {
+      date: "2026-09-16",
+      label: "09.16",
+      items: [
+        {
+          id: "openai-2026-09-16-0",
+          title: "标题",
+          summary: "摘要",
+          category: "模型技术快讯",
+          sourceLabel: "OpenAI",
+          heat: 70,
+          sourceUrl: "https://example.com",
+        },
+      ],
+    };
+    await writeFile(path.join(archiveDir, "2026-09-16.json"), JSON.stringify(digest), "utf8");
+
+    const entries = await rebuildSearchIndex(dir, "2026-09-16");
+
+    assert.equal(entries.length, 1);
+    assert.equal(entries[0].id, "openai-2026-09-16-0");
+    assert.equal(entries[0].source, "OpenAI");
+    const written = JSON.parse(await readFile(path.join(dir, "search-index.json"), "utf8"));
+    assert.equal(written.length, 1);
   });
 });
 

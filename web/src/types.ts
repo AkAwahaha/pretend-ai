@@ -45,11 +45,24 @@ export interface Term {
   explain: string;
 }
 
+export interface SearchEntry {
+  id: string;
+  date: string;
+  title: string;
+  summary: string;
+  category: string;
+  source: string;
+  sourceKey?: SourceKey;
+  heat: number;
+  url: string;
+}
+
 export interface DailyDigest {
   date: string;
   label: string;
   headline: string;
   kicker: string;
   mainline?: string;
+  takeaways?: string[];
   items: DigestItem[];
 }

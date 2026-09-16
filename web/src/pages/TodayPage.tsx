@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Compass, Download, SlidersHorizontal } from "lucide-react";
+import { CheckCircle2, Compass, Download, SlidersHorizontal } from "lucide-react";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
@@ -114,6 +114,19 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
             ))}
           </div>
           {items.length === 0 ? <p className="empty-state">这个分类今天还没有内容</p> : null}
+          {digest.takeaways && digest.takeaways.length > 0 ? (
+            <div className="takeaways">
+              <h3 className="takeaways__title">
+                <CheckCircle2 size={15} />
+                今日收获
+              </h3>
+              <ol className="takeaways__list">
+                {digest.takeaways.map((text) => (
+                  <li key={text}>{text}</li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
         </section>
       </div>
 
