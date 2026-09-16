@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties, TouchEvent } from "react";
+import type { TouchEvent } from "react";
 import { ArrowUpRight, Bookmark, ChevronLeft, ChevronRight, Flame } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
 import { SourceTag } from "../components/SourceTag";
@@ -16,6 +16,9 @@ interface DetailPageProps {
   onNavigate?: (id: string) => void;
 }
 
+const MAX_DRAG = 200;
+const TURN_RATIO = 220;
+
 export function DetailPage({
   item,
   favorite,
@@ -24,11 +27,15 @@ export function DetailPage({
   navIds = [],
   onNavigate,
 }: DetailPageProps) {
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const dragDelta = useRef(0);
+  const pendingDelta = useRef(0);
+  const rafRef = useRef<number | null>(null);
   const timerRef = useRef<number | null>(null);
+
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [phase, setPhase] = useState<"idle" | "out">("idle");
-  const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [imageFailed, setImageFailed] = useState(false);
@@ -37,13 +44,27 @@ export function DetailPage({
   const prevId = index > 0 ? navIds[index - 1] : undefined;
   const nextId = index >= 0 && index < navIds.length - 1 ? navIds[index + 1] : undefined;
 
-  const turnRatio = Math.max(-1, Math.min(1, dragX / 220));
-  const turnDeg = turnRatio * -18;
+  const applyDrag = useCallback((delta: number) => {
+    const panel = panelRef.current;
+    if (!panel) {
+      return;
+    }
+    const ratio = Math.max(-1, Math.min(1, delta / TURN_RATIO));
+    const deg = ratio * -16;
+    panel.style.transform = `translate3d(${delta}px, 0, 0) rotateY(${deg}deg)`;
+    panel.style.transformOrigin = delta > 0 ? "right center" : "left center";
+    panel.style.setProperty("--drag-x", `${delta}px`);
+    panel.style.setProperty("--drag-rot", `${deg}deg`);
+  }, []);
 
   const commitNavigation = useCallback(
     (targetId: string, nextDirection: "next" | "prev") => {
       if (!onNavigate) {
         return;
+      }
+      const panel = panelRef.current;
+      if (panel) {
+        panel.style.removeProperty("transform");
       }
       setDirection(nextDirection);
       setPhase("out");
@@ -52,9 +73,10 @@ export function DetailPage({
       }
       timerRef.current = window.setTimeout(() => {
         setPhase("idle");
-        setDragX(0);
+        dragDelta.current = 0;
+        pendingDelta.current = 0;
         onNavigate(targetId);
-      }, 210);
+      }, 200);
     },
     [onNavigate],
   );
@@ -97,6 +119,9 @@ export function DetailPage({
 
   useEffect(
     () => () => {
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+      }
       if (timerRef.current !== null) {
         window.clearTimeout(timerRef.current);
       }
@@ -104,7 +129,19 @@ export function DetailPage({
     [],
   );
 
+  const resetDrag = () => {
+    const panel = panelRef.current;
+    if (panel) {
+      panel.style.removeProperty("transform");
+    }
+    dragDelta.current = 0;
+    pendingDelta.current = 0;
+  };
+
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    if (phase !== "idle") {
+      return;
+    }
     touchStartX.current = event.touches[0]?.clientX ?? null;
     setDragging(true);
   };
@@ -114,44 +151,48 @@ export function DetailPage({
       return;
     }
     const current = event.touches[0]?.clientX ?? touchStartX.current;
-    const delta = current - touchStartX.current;
-    setDragX(Math.max(-200, Math.min(200, delta)));
+    const next = Math.max(-MAX_DRAG, Math.min(MAX_DRAG, current - touchStartX.current));
+    dragDelta.current = next;
+    pendingDelta.current = next;
+
+    if (rafRef.current === null) {
+      rafRef.current = window.requestAnimationFrame(() => {
+        rafRef.current = null;
+        applyDrag(pendingDelta.current);
+      });
+    }
   };
 
   const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
     const start = touchStartX.current;
     touchStartX.current = null;
     setDragging(false);
+
     if (start === null) {
-      setDragX(0);
+      resetDrag();
       return;
     }
+
     const endX = event.changedTouches[0]?.clientX ?? start;
     const delta = endX - start;
-    if (Math.abs(delta) < 60) {
-      setDragX(0);
+
+    if (delta > 60 && prevId) {
+      commitNavigation(prevId, "prev");
       return;
     }
-    if (delta > 0 && prevId) {
-      commitNavigation(prevId, "prev");
-    } else if (delta < 0 && nextId) {
+    if (delta < -60 && nextId) {
       commitNavigation(nextId, "next");
-    } else {
-      setDragX(0);
+      return;
     }
+    resetDrag();
   };
 
   const showImage = Boolean(item.image) && !imageFailed;
-  const panelStyle = {
-    "--drag-x": `${dragX}px`,
-    "--drag-rot": `${turnDeg}deg`,
-    transform: dragging ? `translateX(${dragX}px) rotateY(${turnDeg}deg)` : undefined,
-    transformOrigin: dragX > 0 ? "right center" : "left center",
-  } as CSSProperties;
 
   return (
     <div
       className="frame frame--detail"
+      data-turning={dragging || phase === "out"}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -177,16 +218,16 @@ export function DetailPage({
         />
 
         <div
+          ref={panelRef}
           className="detail-panel"
           key={item.id}
           data-direction={direction}
           data-phase={phase}
           data-dragging={dragging}
-          style={panelStyle}
         >
           {showImage ? (
             <div className="detail-banner">
-              <img src={item.image} alt="" loading="lazy" onError={() => setImageFailed(true)} />
+              <img src={item.image} alt="" loading="lazy" decoding="async" onError={() => setImageFailed(true)} />
               <span className="detail-banner__fade" />
             </div>
           ) : null}

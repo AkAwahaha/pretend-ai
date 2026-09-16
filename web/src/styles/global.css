@@ -1506,3 +1506,25 @@ body {
 .detail-panel[data-dragging="true"]::after {
   opacity: 0.75;
 }
+/* ===== 翻书动画性能优化 ===== */
+
+.frame--detail[data-turning="true"] .glow {
+  animation-play-state: paused;
+}
+
+.frame--detail[data-turning="true"] .reading-progress span {
+  transition: none;
+}
+
+.detail-panel {
+  contain: layout paint;
+  will-change: transform;
+}
+
+.detail-panel[data-dragging="true"] {
+  box-shadow: 0 18px 40px rgba(23, 24, 28, 0.14);
+}
+
+.detail-panel[data-dragging="true"]::after {
+  transition: none;
+}
