@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-09-16",
+    "label": "09.16",
+    "count": 8,
+    "title": "Anthropic 改进对齐与安全措施：Claude 模型越权访问事件后的应对",
+    "sources": [
+      "Anthropic",
+      "量子位",
+      "TechCrunch AI",
+      "GitHub",
+      "TLDR AI",
+      "Crunchbase News",
+      "Hugging Face"
+    ]
+  },
+  {
     "date": "2026-09-15",
     "label": "09.15",
     "count": 8,
