@@ -5,7 +5,6 @@ import { GlowBackground } from "../components/GlowBackground";
 import { SourceTag } from "../components/SourceTag";
 import { ThreeQuestionCard } from "../components/ThreeQuestionCard";
 import { TopBar } from "../components/TopBar";
-import { SOURCE_META } from "../data/sources";
 import type { DigestItem } from "../types";
 
 interface DetailPageProps {
@@ -31,7 +30,6 @@ export function DetailPage({
   const index = navIds.indexOf(item.id);
   const prevId = index > 0 ? navIds[index - 1] : undefined;
   const nextId = index >= 0 && index < navIds.length - 1 ? navIds[index + 1] : undefined;
-  const meta = SOURCE_META[item.source];
 
   const goPrev = useCallback(() => {
     if (prevId && onNavigate) {
@@ -117,7 +115,7 @@ export function DetailPage({
           data-direction={direction}
           style={dragX ? ({ transform: `translateX(${dragX}px)` } as CSSProperties) : undefined}
         >
-          <div className="detail-strip" style={{ background: meta?.color ?? "#5e6ad2" }} />
+          <div className="detail-strip" />
 
           <div className="detail-head">
             <div className="detail-meta">

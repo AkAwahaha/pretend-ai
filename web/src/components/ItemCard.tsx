@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { CSSProperties } from "react";
 import { Bookmark, Flame } from "lucide-react";
-import { SOURCE_META } from "../data/sources";
 import type { DigestItem } from "../types";
 import { SourceTag } from "./SourceTag";
 
@@ -15,7 +14,6 @@ interface ItemCardProps {
 
 export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0 }: ItemCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
-  const meta = SOURCE_META[item.source];
   const showImage = Boolean(item.image) && !imageFailed;
 
   return (
@@ -44,7 +42,7 @@ export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0 }
       <div className="item-card__body">
         <div
           className="item-card__thumb"
-          style={showImage ? undefined : { background: meta?.tint, color: meta?.color }}
+          style={showImage ? undefined : { background: "var(--brand-tint)", color: "var(--brand)" }}
         >
           {showImage ? (
             <img src={item.image} alt="" loading="lazy" onError={() => setImageFailed(true)} />

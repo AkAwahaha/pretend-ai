@@ -1,10 +1,8 @@
-export function GlowBackground({ watermark = false }: { watermark?: boolean }) {
+export function GlowBackground() {
   return (
     <>
-      <div className="glow glow--coral" />
-      <div className="glow glow--violet" />
-      <div className="glow glow--pink" />
-      {watermark ? <div className="watermark">DAILY</div> : null}
+      <div className="glow glow--indigo" />
+      <div className="glow glow--lavender" />
     </>
   );
 }

@@ -10,17 +10,20 @@ interface SourceTagProps {
 export function SourceTag({ source, label, variant = "pill" }: SourceTagProps) {
   const meta = SOURCE_META[source];
   const text = label ?? meta.label;
+  const dot = <span className="source-dot" style={{ background: meta.color }} aria-hidden="true" />;
 
   if (variant === "text") {
     return (
-      <span className="source-tag source-tag--text" style={{ color: meta.color }}>
+      <span className="source-tag source-tag--text">
+        {dot}
         {text}
       </span>
     );
   }
 
   return (
-    <span className="source-tag" style={{ background: meta.tint, color: meta.color }}>
+    <span className="source-tag">
+      {dot}
       {text}
     </span>
   );
