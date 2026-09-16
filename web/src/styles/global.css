@@ -1408,7 +1408,7 @@ body {
 
 @keyframes pageInNext {
   from {
-    transform: translateX(18%) rotateY(-12deg);
+    transform: translateX(22%) rotateY(-14deg);
     opacity: 0;
   }
   to {
@@ -1419,7 +1419,7 @@ body {
 
 @keyframes pageInPrev {
   from {
-    transform: translateX(-18%) rotateY(12deg);
+    transform: translateX(-22%) rotateY(14deg);
     opacity: 0;
   }
   to {
@@ -1429,11 +1429,11 @@ body {
 }
 
 .detail-panel[data-direction="next"] {
-  animation: pageInNext 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: pageInNext 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .detail-panel[data-direction="prev"] {
-  animation: pageInPrev 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: pageInPrev 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .detail-panel::after {
