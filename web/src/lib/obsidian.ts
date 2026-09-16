@@ -64,6 +64,20 @@ async function requestWithFallback(path: string, init: RequestInit, key: string)
   throw lastError ?? new Error("无法连接本地 Obsidian");
 }
 
+export function buildObsidianUri(fileName: string, markdown: string, vault = ""): string {
+  const params = new URLSearchParams();
+  if (vault.trim().length > 0) {
+    params.set("vault", vault.trim());
+  }
+  params.set("file", obsidianPath(fileName));
+  params.set("content", markdown);
+  params.set("overwrite", "true");
+  // URLSearchParams 会把空格编码成 +，替换成 %20 更稳妥
+  return `obsidian://new?${params.toString().replace(/\+/g, "%20")}`;
+}
+
+export const OBSIDIAN_URI_MAX_LENGTH = 6000;
+
 export async function testObsidianConnection(key = getObsidianKey()): Promise<void> {
   if (!key) {
     throw new Error("还没有填写 API Key");

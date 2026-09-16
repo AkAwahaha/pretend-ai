@@ -5,6 +5,7 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
+  BookOpen,
   Download,
   FileDown,
   Flame,
@@ -16,6 +17,8 @@ import { ThreeQuestionCard } from "../components/ThreeQuestionCard";
 import { TopBar } from "../components/TopBar";
 import { dateFromItemId, downloadMarkdown, itemFileName, itemToMarkdown } from "../lib/markdown";
 import {
+  OBSIDIAN_URI_MAX_LENGTH,
+  buildObsidianUri,
   describeObsidianError,
   getObsidianKey,
   saveToObsidian,
@@ -219,6 +222,16 @@ export function DetailPage({
     }
   };
 
+  const handleOpenInObsidian = () => {
+    const uri = buildObsidianUri(fileName, markdown);
+    if (uri.length > OBSIDIAN_URI_MAX_LENGTH) {
+      setObsidianState("error");
+      setObsidianMessage("这条内容较长，系统可能截断 URI，建议用左边的「存入 Obsidian」（电脑）或「下载」（手机）");
+      return;
+    }
+    window.location.href = uri;
+  };
+
   const handleSaveKey = async () => {
     const key = keyInput.trim();
     if (!key) {
@@ -324,6 +337,11 @@ export function DetailPage({
                 <Download size={16} />
               </button>
             </div>
+
+            <button type="button" className="obsidian-uri-btn" onClick={handleOpenInObsidian}>
+              <BookOpen size={15} />
+              在 Obsidian 中打开（手机可用）
+            </button>
 
             {obsidianMessage ? (
               <p className={obsidianState === "error" ? "obsidian-status obsidian-status--error" : "obsidian-status"}>
