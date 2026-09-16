@@ -59,6 +59,9 @@ export function itemToMarkdown(item: DigestItem, date: string): string {
     "",
     item.productView,
     "",
+    ...(item.terms && item.terms.length > 0
+      ? ["## 关键术语", "", ...item.terms.map((entry) => `- **${entry.term}**：${entry.explain}`), ""]
+      : []),
     `[阅读原文](${item.sourceUrl})`,
     "",
     "---",
@@ -88,6 +91,9 @@ export function digestToMarkdown(digest: DailyDigest): string {
       "",
       item.productView,
       "",
+      ...(item.terms && item.terms.length > 0
+        ? ["### 关键术语", "", ...item.terms.map((entry) => `- **${entry.term}**：${entry.explain}`), ""]
+        : []),
       `[阅读原文](${item.sourceUrl})`,
       "",
       "---",
@@ -108,6 +114,7 @@ export function digestToMarkdown(digest: DailyDigest): string {
     "",
     `共 ${digest.items.length} 条内容，按热度排序。`,
     "",
+    ...(digest.mainline ? [`> 今日主线：${digest.mainline}`, ""] : []),
     ...sections,
     `来源：假装懂 AI · ${SITE_URL}`,
     "",

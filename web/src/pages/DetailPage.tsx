@@ -9,6 +9,7 @@ import {
   Download,
   FileDown,
   Flame,
+  BookMarked,
   Loader2,
 } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
@@ -374,6 +375,23 @@ export function DetailPage({
             ) : null}
 
             <ThreeQuestionCard item={item} />
+
+            {item.terms && item.terms.length > 0 ? (
+              <section className="terms">
+                <h2 className="terms__title">
+                  <BookMarked size={15} />
+                  关键术语
+                </h2>
+                <dl className="terms__list">
+                  {item.terms.map((entry) => (
+                    <div className="terms__item" key={entry.term}>
+                      <dt className="terms__term">{entry.term}</dt>
+                      <dd className="terms__explain">{entry.explain}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ) : null}
 
             <a className="source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
               {item.sourceUrl}

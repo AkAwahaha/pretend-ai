@@ -279,9 +279,10 @@ export function createItemId(item, date, index) {
   return item.sourceKey + "-" + date + "-" + index;
 }
 
-export function buildDigest({ date, selected, cards }) {
+export function buildDigest({ date, selected, cards, mainline = "" }) {
   return {
     date,
+    mainline,
     label: date.slice(5).replace("-", "."),
     headline: "今日 AI 日报",
     kicker: "DAILY BRIEF",
@@ -296,6 +297,7 @@ export function buildDigest({ date, selected, cards }) {
       sourceUrl: item.url,
       image: item.image ?? "",
       readTime: cards[index].readTime,
+      terms: cards[index].terms ?? [],
       title: cards[index].title,
       summary: cards[index].summary,
       what: cards[index].what,

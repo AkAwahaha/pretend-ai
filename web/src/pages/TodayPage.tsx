@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Download, SlidersHorizontal } from "lucide-react";
+import { Compass, Download, SlidersHorizontal } from "lucide-react";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
@@ -51,6 +51,16 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
           </div>
           <p className="hero__meta">用产品视野看 AI · 每日更新 · {BUILD_ID}</p>
         </section>
+
+        {digest.mainline ? (
+          <section className="mainline">
+            <p className="mainline__label">
+              <Compass size={13} />
+              今日主线
+            </p>
+            <p className="mainline__text">{digest.mainline}</p>
+          </section>
+        ) : null}
 
         <div className="filter-bar">
           <button
