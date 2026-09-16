@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
+import { BrandMark } from "../components/BrandMark";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
@@ -44,7 +45,7 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
               <p className="hero__kicker">{digest.kicker}</p>
               <h1 className="hero__title">{digest.headline}</h1>
             </div>
-            <div className="hero__orb" aria-hidden="true" />
+            <BrandMark />
           </div>
           <p className="hero__meta">用产品视野看 AI · 每日更新</p>
         </section>
