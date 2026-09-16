@@ -76,7 +76,7 @@ export function DetailPage({
         dragDelta.current = 0;
         pendingDelta.current = 0;
         onNavigate(targetId);
-      }, 200);
+      }, 110);
     },
     [onNavigate],
   );
