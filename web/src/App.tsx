@@ -73,6 +73,7 @@ export function App() {
           mastery={getMastery(item.id)}
           onSetMastery={setMastery}
           onCreateNote={addNote}
+          notes={notes.filter((note) => note.link?.itemId === item.id)}
           navIds={navIds}
           onNavigate={(id) => navigate(`/item/${id}`)}
         />

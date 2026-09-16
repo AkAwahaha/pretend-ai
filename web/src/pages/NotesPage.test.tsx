@@ -51,6 +51,7 @@ describe("NotesPage", () => {
     );
 
     expect(screen.getByText(/OpenAI · 一条 AI 新闻/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /导入 Obsidian/ })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("编辑灵感"), { target: { value: "更新后的判断" } });
     fireEvent.click(screen.getByRole("button", { name: "保存" }));
     expect(onUpdate).toHaveBeenCalledWith("note-1", "更新后的判断");

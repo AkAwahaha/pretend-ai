@@ -30,7 +30,7 @@ import {
   testObsidianConnection,
 } from "../lib/obsidian";
 import type { MasteryState } from "../hooks/useMastery";
-import type { NoteInput } from "../hooks/useNotes";
+import type { Note, NoteInput } from "../hooks/useNotes";
 import type { DigestItem } from "../types";
 
 interface DetailPageProps {
@@ -42,10 +42,11 @@ interface DetailPageProps {
   onNavigate?: (id: string) => void;
   mastery?: MasteryState | null;
   onCreateNote?: (input: NoteInput) => unknown;
+  notes?: Note[];
   onSetMastery?: (id: string, state: MasteryState) => void;
 }
 
-const SHOW_OBSIDIAN = false;
+const SHOW_OBSIDIAN = true;
 const MAX_DRAG = 200;
 const TURN_RATIO = 220;
 
@@ -58,6 +59,7 @@ export function DetailPage({
   onNavigate,
   mastery = null,
   onCreateNote,
+  notes = [],
   onSetMastery,
 }: DetailPageProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -82,7 +84,7 @@ export function DetailPage({
 
   const date = dateFromItemId(item.id);
   const fileName = itemFileName(item, date);
-  const markdown = itemToMarkdown(item, date);
+  const markdown = itemToMarkdown(item, date, notes);
 
   const applyDrag = useCallback((delta: number) => {
     const panel = panelRef.current;

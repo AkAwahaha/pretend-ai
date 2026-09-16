@@ -17,6 +17,8 @@ describe("DetailPage", () => {
       />,
     );
 
+    expect(screen.getByRole("button", { name: "存入 Obsidian" })).toBeInTheDocument();
+    expect(screen.getByText("在 Obsidian 中打开（手机可用）")).toBeInTheDocument();
     fireEvent.change(screen.getByPlaceholderText("这条内容让你想到什么？"), {
       target: { value: "这条可以用于面试回答" },
     });

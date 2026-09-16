@@ -1842,3 +1842,33 @@ a {
   background: #fdf0e3;
   color: #b45309;
 }
+
+.notes-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.notes-obsidian-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.notes-obsidian-btn--ghost {
+  width: 34px;
+  margin-left: auto;
+  padding: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-secondary);
+}

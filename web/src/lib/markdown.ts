@@ -2,6 +2,17 @@ import type { DailyDigest, DigestItem } from "../types";
 
 const SITE_URL = "https://akawahaha.github.io/pretend-ai/";
 
+export interface MarkdownNote {
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+  link?: {
+    title: string;
+    sourceLabel: string;
+    sourceUrl: string;
+  };
+}
+
 function yamlValue(value: string): string {
   return JSON.stringify(String(value ?? ""));
 }
@@ -13,6 +24,16 @@ function safeFileName(input: string, fallback = "item"): string {
     .trim()
     .slice(0, 60);
   return cleaned.length > 0 ? cleaned : fallback;
+}
+
+function formatTimestamp(value: number): string {
+  const date = new Date(value);
+  const pad = (part: number) => String(part).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+  ].join("-") + " " + [pad(date.getHours()), pad(date.getMinutes())].join(":");
 }
 
 export function dateFromItemId(id: string): string {
@@ -28,8 +49,24 @@ export function digestFileName(digest: DailyDigest): string {
   return `${digest.date}-假装懂AI日报.md`;
 }
 
-export function itemToMarkdown(item: DigestItem, date: string): string {
+export function notesFileName(date: string): string {
+  return `${date}-我的灵感.md`;
+}
+
+export function itemToMarkdown(item: DigestItem, date: string, notes: MarkdownNote[] = []): string {
   const tags = ["AI日报", item.category].filter(Boolean);
+  const noteSection = notes.length > 0
+    ? [
+        "## 我的灵感",
+        "",
+        ...notes.flatMap((note) => [
+          `### ${formatTimestamp(note.updatedAt)}`,
+          "",
+          note.content,
+          "",
+        ]),
+      ]
+    : [];
 
   return [
     "---",
@@ -59,9 +96,47 @@ export function itemToMarkdown(item: DigestItem, date: string): string {
     "",
     item.productView,
     "",
+    ...noteSection,
     `[阅读原文](${item.sourceUrl})`,
     "",
     "---",
+    `来源：假装懂 AI · ${SITE_URL}`,
+    "",
+  ].join("\n");
+}
+
+export function notesToMarkdown(notes: MarkdownNote[], date: string): string {
+  const sections = notes.map((note) => {
+    const link = note.link && note.link.sourceUrl
+      ? `[${note.link.sourceLabel} · ${note.link.title}](${note.link.sourceUrl})`
+      : "独立笔记";
+
+    return [
+      `## ${formatTimestamp(note.updatedAt)}`,
+      "",
+      note.content,
+      "",
+      `关联：${link}`,
+      "",
+      "---",
+      "",
+    ].join("\n");
+  });
+
+  return [
+    "---",
+    `date: ${yamlValue(date)}`,
+    `count: ${notes.length}`,
+    "type: \"我的灵感\"",
+    "tags:",
+    "  - 我的灵感",
+    "---",
+    "",
+    `# 我的灵感 · ${date}`,
+    "",
+    `共 ${notes.length} 条记录。`,
+    "",
+    ...sections,
     `来源：假装懂 AI · ${SITE_URL}`,
     "",
   ].join("\n");
