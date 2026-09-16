@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDigest, collectRawItems, dedupe, scoreItems, selectItems, writeDigest } from "./generate.js";
+import { enrichImages } from "./images.js";
 import { getLlmConfig, summarizeItem } from "./llm.js";
 import { itemKey, loadSeen, saveSeen, splitFresh } from "./seen.js";
 
@@ -133,6 +134,9 @@ const ordered = picked
 
 const selected = ordered.map((entry) => ({ ...entry.item, featured: false, heat: entry.scored.heat }));
 const cards = ordered.map((entry) => entry.card);
+
+await enrichImages(selected);
+console.log("配图补齐：" + selected.filter((item) => item.image).length + "/" + selected.length + " 条带图");
 const digest = buildDigest({ date, selected, cards });
 await writeDigest(digest, { outDir });
 
