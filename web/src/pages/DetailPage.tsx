@@ -25,7 +25,9 @@ export function DetailPage({
   onNavigate,
 }: DetailPageProps) {
   const touchStartX = useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null);
   const [direction, setDirection] = useState<"next" | "prev">("next");
+  const [phase, setPhase] = useState<"idle" | "out">("idle");
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -35,19 +37,39 @@ export function DetailPage({
   const prevId = index > 0 ? navIds[index - 1] : undefined;
   const nextId = index >= 0 && index < navIds.length - 1 ? navIds[index + 1] : undefined;
 
+  const turnRatio = Math.max(-1, Math.min(1, dragX / 220));
+  const turnDeg = turnRatio * -18;
+
+  const commitNavigation = useCallback(
+    (targetId: string, nextDirection: "next" | "prev") => {
+      if (!onNavigate) {
+        return;
+      }
+      setDirection(nextDirection);
+      setPhase("out");
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+      }
+      timerRef.current = window.setTimeout(() => {
+        setPhase("idle");
+        setDragX(0);
+        onNavigate(targetId);
+      }, 210);
+    },
+    [onNavigate],
+  );
+
   const goPrev = useCallback(() => {
-    if (prevId && onNavigate) {
-      setDirection("prev");
-      onNavigate(prevId);
+    if (prevId) {
+      commitNavigation(prevId, "prev");
     }
-  }, [prevId, onNavigate]);
+  }, [prevId, commitNavigation]);
 
   const goNext = useCallback(() => {
-    if (nextId && onNavigate) {
-      setDirection("next");
-      onNavigate(nextId);
+    if (nextId) {
+      commitNavigation(nextId, "next");
     }
-  }, [nextId, onNavigate]);
+  }, [nextId, commitNavigation]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -73,6 +95,15 @@ export function DetailPage({
     return () => window.removeEventListener("scroll", onScroll);
   }, [item.id]);
 
+  useEffect(
+    () => () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+      }
+    },
+    [],
+  );
+
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;
     setDragging(true);
@@ -84,30 +115,39 @@ export function DetailPage({
     }
     const current = event.touches[0]?.clientX ?? touchStartX.current;
     const delta = current - touchStartX.current;
-    setDragX(Math.max(-140, Math.min(140, delta)));
+    setDragX(Math.max(-200, Math.min(200, delta)));
   };
 
   const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
     const start = touchStartX.current;
     touchStartX.current = null;
     setDragging(false);
-    setDragX(0);
     if (start === null) {
+      setDragX(0);
       return;
     }
     const endX = event.changedTouches[0]?.clientX ?? start;
     const delta = endX - start;
     if (Math.abs(delta) < 60) {
+      setDragX(0);
       return;
     }
-    if (delta > 0) {
-      goPrev();
+    if (delta > 0 && prevId) {
+      commitNavigation(prevId, "prev");
+    } else if (delta < 0 && nextId) {
+      commitNavigation(nextId, "next");
     } else {
-      goNext();
+      setDragX(0);
     }
   };
 
   const showImage = Boolean(item.image) && !imageFailed;
+  const panelStyle = {
+    "--drag-x": `${dragX}px`,
+    "--drag-rot": `${turnDeg}deg`,
+    transform: dragging ? `translateX(${dragX}px) rotateY(${turnDeg}deg)` : undefined,
+    transformOrigin: dragX > 0 ? "right center" : "left center",
+  } as CSSProperties;
 
   return (
     <div
@@ -140,8 +180,9 @@ export function DetailPage({
           className="detail-panel"
           key={item.id}
           data-direction={direction}
+          data-phase={phase}
           data-dragging={dragging}
-          style={dragX ? ({ transform: `translateX(${dragX}px)` } as CSSProperties) : undefined}
+          style={panelStyle}
         >
           {showImage ? (
             <div className="detail-banner">
@@ -198,7 +239,7 @@ export function DetailPage({
           </div>
         ) : null}
 
-        {navIds.length > 1 ? <p className="swipe-hint">左右滑动切换上一条 / 下一条</p> : null}
+        {navIds.length > 1 ? <p className="swipe-hint">像翻书一样左右滑动切换</p> : null}
       </div>
     </div>
   );
