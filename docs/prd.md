@@ -1,136 +1,160 @@
 # PRD：假装懂 AI
 
-产品名含义：不是假装懂技术，而是用产品的视野看问题。
+> 不是假装懂技术，而是用产品的视野看问题。
 
-## 一句话定位
+- 线上地址：https://akawahaha.github.io/pretend-ai/
+- 最后更新：2026-09-16
+- 相关文档：[系统架构](architecture.md)、[信息源清单](sources.md)、[AI 落地 Playbook](ai-playbook.md)、[技术方案](tech-design.md)、[UI 规格](ui-spec.md)、[问题与改进记录](issues-and-improvements.md)
 
-每天早上打开手机网页，5 分钟看完 AI 圈大事和 GitHub 高分项目，每条都告诉你：这是什么、亮点和实现思路是什么、用产品视野怎么看。
+## 1. 产品定位
 
-## 问题
+### 一句话定位
 
-- AI 资讯和项目更新太快，准备 AI PM 面试的人没时间筛选
+每天早上 5 分钟，看完 AI 圈大事和 GitHub 高分项目。每条内容回答三个问题：**这是什么**、**核心亮点与实现思路**、**用产品视野怎么看**。
+
+### 目标用户
+
+- 第一阶段：正在准备 AI 产品经理面试的人
+- 扩展：想转型或入行 AI 产品、需要快速建立行业认知的人
+
+### 解决的问题
+
+- AI 资讯和项目更新太快，没时间筛选
 - 自媒体内容碎片化、标题党，看完讲不出所以然
-- GitHub README 偏技术，产品经理难提炼实现思路和产品价值
+- GitHub README 偏技术，产品经理难提炼实现思路
 - 资讯与产品判断之间缺一座桥
 
-## 目标用户
+### 竞品与借鉴
 
-- 第一阶段：正在准备 AI 产品经理面试的人（先满足自己）
-- 扩展：想转型或入行 AI 产品，需要快速建立行业认知的人
-
-## 现在的解决方式与问题
-
-- 刷公众号、小红书、即刻等自媒体平台
-- 偶尔看 GitHub Trending、Hacker News
-- 用 ChatGPT 零散提问
-
-问题：被动接收、信息碎片、收藏了不看、无法转化为产品判断。
-
-## 竞品与借鉴
-
-- 机器之心 / 量子位 / TLDR AI：资讯全，但面向“知道发生了什么”
-- GitHub Trending / HelloGitHub / Trendshift：列项目，不讲产品视角
+- 机器之心 / 量子位 / TLDR AI：资讯全，但面向"知道发生了什么"
+- GitHub Trending / HelloGitHub：列项目，不讲产品视角
 - Perplexity / ChatGPT：需要主动提问，不会每日主动整理
 
 借鉴：日报的固定节奏、Trending 的发现机制、面试题库的结构化表达。
 
-## 差异化
+### 差异化
 
-每条内容回答三个问题：
+1. 每条内容回答三个固定问题：是什么 / 亮点与思路 / 产品视野怎么看
+2. 按内容主题分类，而不是按来源堆砌
+3. 去重 + 已发布过滤，优先只推新内容
+4. 移动端优先，5 分钟读完
 
-1. 这是什么（一句话说清）
-2. 核心亮点 / 实现思路（人话版）
-3. 用产品视野怎么看（可能的问题 + 回答框架）
+## 2. 内容策略
 
-定位：不是资讯堆砌，而是“用产品视野看的 AI 情报 + 项目拆解”。
+### 信息源
 
-## 信息源
+共 **20 个源**，分 7 类来源（一手官方、国内动态、行业新闻、项目发现、省时日报、商业视角、前沿论文）。完整清单、每个源的简介与选择理由见 [sources.md](sources.md)。
 
-MVP 默认五类：
+覆盖：OpenAI、Anthropic、Google DeepMind、量子位、新智元、InfoQ 中文、钛媒体、雷峰网、爱范儿、TechCrunch AI、The Verge AI、Ars Technica、Hacker News、MIT Tech Review、TLDR AI、Menlo Ventures、Crunchbase News、GitHub Search API、Hugging Face Daily Papers、arXiv。
 
-1. 一手官方：OpenAI Blog、Anthropic News、Google DeepMind Blog
-2. 省时日报：TLDR AI、The Batch
-3. 前沿论文：Hugging Face Daily Papers、arXiv（cs.CL / cs.AI）
-4. 项目发现：GitHub Trending、GitHub API（topic 为 llm / ai-agents，按近期星标增速）、Trendshift
-5. 商业视角：a16z AI、Menlo Ventures 报告
+### 内容分类（用户可见）
 
-备选与后续扩展：TechCrunch AI、The Verge AI、MIT Technology Review、机器之心、量子位、新智元、Founder Park、海外独角兽、特工宇宙、Import AI、Ben's Bites、Lenny's Newsletter、Stanford HAI AI Index、LMArena、Hugging Face Trending。
+按**内容主题**划分，而不是按来源划分，由大模型在生成卡片时判定：
 
-### 已实测可用（2026-09-12 验证）
+| 主题 | 覆盖内容 |
+| --- | --- |
+| 模型技术快讯 | 新版本、开源模型、评测、论文 |
+| 商业资本动态 | 定价、投融资、厂商财报、合作并购 |
+| 算力硬件上游 | 芯片、服务器、端侧 AI |
+| 行业应用落地 | C 端产品、各垂直行业大模型 |
+| 政策监管治理 | 法规、备案、AI 安全 |
+| 开源开发者生态 | 框架、社区工具、开发者项目 |
+| 深度观点与趋势分析 | 行业讨论、趋势判断、人物观点 |
 
-- OpenAI Blog RSS：https://openai.com/news/rss.xml
-- Google DeepMind Blog RSS：https://deepmind.google/blog/rss.xml
-- TLDR AI RSS：https://tldr.tech/api/rss/ai
-- Menlo Ventures RSS：https://menlovc.com/feed/
-- GitHub Search API：https://api.github.com/search/repositories（按主题 + 近期活跃度 + star 排序）
-
-### 待接入 / 受限
-
-- Hugging Face Daily Papers API：当前网络被挡，作为可选源，在 GitHub Actions 环境重试
-- arXiv API：当前网络被挡，作为可选源
-- Anthropic News：没有公开 RSS，第一版用 HTML 抓取标题，后续再找稳定接口
-- a16z AI：feed 返回 404，后续更换路径或手动补充
-
-### 抓取说明
-
-公众号、小红书、抖音没有稳定接口，第一版以手动补充链接为主。单个来源失败不影响整体生成，管线会跳过并在日志中标注。
-
-## MVP 范围
-
-包含：
-
-- 每天自动生成一份日报（默认早上 8:00）
-- 混合深度：3 条精读 + 5~8 条速览
-- 精读内容覆盖 AI 资讯和 GitHub 高分项目
-- 每条包含：来源链接、一句话摘要、亮点/思路、产品视角
-- 手机适配网页，支持收藏和回看历史
-- 静态站点，每日自动更新
-
-不包含：
-
-- 用户账号、多用户、个性化推荐
-- 社交、评论、排行榜
-- 原生 App、推送通知（第一版只在网页看）
-- 自动生成完整面试题库
-
-## 内容规范
+### 内容规范
 
 - 所有内容用简体中文输出；公司名、产品名、模型名、开源仓库名可以保留英文
 - 标题用中文概括，开源项目保留 owner/repo
 - 阅读时长用「X 分钟」格式
 - 生成结果经过校验，出现整句未翻译英文时自动重试
 
-## 发布形态
+### 每日精选规则（8 条）
 
-- 第一阶段：手机适配网页（PWA 可选），每日自动更新
+1. 抓取：20 个源各自取其最新 3-5 条
+2. 去重：按标题规范化去重
+3. 已发布过滤：优先只选没发过的内容，避免连续重复
+4. 选取：按来源类型轮询（保证类型多样）+ 同类目内按来源轮换（避免单一来源霸榜），取前 16 条做候选
+5. 生成：大模型逐条生成结构化卡片并判定主题，3 路并发，失败换下一条候选
+6. 产出：前 3 条为精读，其余为速览
+
+## 3. 信息架构
+
+### 页面
+
+1. **今日日报（首页）**：品牌头 → Hero（日期、条数、阅读时长）→ 主题筛选 → 精读区 → 速览区 → 底部导航
+2. **内容详情**：来源标签 → 标题 → 概述 → 阅读原文按钮 → 三问卡片（这是什么 / 核心亮点与实现思路 / 产品视角）→ 原文链接
+3. **收藏**：本地存储，无需账号
+4. **历史日报**：读取归档，按日期回看
+
+### 精读与速览的差异
+
+| | 精读 | 速览 |
+| --- | --- | --- |
+| 数量 | 3 条 | 5 条 |
+| 形态 | 独立卡片、左侧靛蓝色条、「精读」角标 | 紧凑列表、分隔线、无卡片外壳 |
+| 概述 | 完整展示不截断 | 最多两行 |
+| 标题字号 | 16px | 14px |
+| 用途 | 完整拆解，单条约 2-3 分钟 | 快速扫过，单条约 30 秒 |
+
+## 4. MVP 范围
+
+包含：
+
+- 每天自动生成一份日报（3 条精读 + 5 条速览）
+- 20 个信息源抓取、去重、已发布过滤
+- 按主题分类与筛选
+- 每条包含：来源、主题、标题、概述、亮点思路、产品视角、原文链接、阅读时长
+- 手机适配网页，支持收藏与历史回看
+- 静态站点，每天自动更新
+
+不包含：
+
+- 用户账号、多用户、个性化推荐
+- 社交、评论、排行榜
+- 原生 App、推送通知
+- 自动生成完整面试题库
+
+## 5. 发布形态
+
+- 第一阶段：手机适配网页（PWA 可选），每天自动更新
 - 第二阶段：邮件 / 微信推送
 
-## 后期规划（先不做）
+## 6. 后期规划（先不做）
 
 - 知识库能力：标签体系、搜索、个人笔记、按主题聚合
 - 文档沉淀：周报 / 月报自动生成，导出 Markdown / PDF
+- Obsidian 联动：日报导出为带 frontmatter 的 Markdown 笔记
+- RAG 问答：基于沉淀的笔记库做检索增强问答
+- 关键词搜索源：接入 Google News / Bing News，覆盖滑出 RSS 窗口的热点
 
-## 技术可行性
+## 7. 技术方案
 
-- 前端：静态网页（Vite + React 或纯静态），手机适配，部署到 Vercel / Netlify / GitHub Pages
-- 后端：无常驻服务器，用 GitHub Actions 每天定时抓取并生成页面
-- 数据获取：RSS / API 优先，自媒体内容手动补充
-- AI：付费 LLM API 做摘要、亮点提炼和产品视角生成，每天几十条内容，成本可控
-- 部署：GitHub Actions 定时生成 + Pages 托管，服务器成本为零
-- 风险：自媒体抓取不稳定、内容版权（只做摘要 + 原文链接）、AI 幻觉（保留原文链接供核对）
+- 前端：Vite + React + TypeScript，纯 CSS（设计 token 用 CSS 变量）
+- 管线：Node.js ESM，`fast-xml-parser` 解析 RSS/Atom
+- 后端：无常驻服务器，GitHub Actions 每天定时抓取与生成
+- 部署：GitHub Actions + GitHub Pages，零服务器成本
+- 数据：静态 JSON（latest / index / archive），归档与已发布索引随仓库持久化
 
-## LLM 接入
+详细设计见 [architecture.md](architecture.md) 与 [tech-design.md](tech-design.md)。
 
-- 协议：OpenAI 兼容的 Chat Completions 接口，通过环境变量配置，不写死在代码里
+## 8. LLM 接入
+
+- 协议：OpenAI 兼容的 Chat Completions 接口，通过环境变量配置
   - `LLM_API_KEY`：API 密钥
-  - `LLM_BASE_URL`：接口地址，默认 `https://api.openai.com/v1`
-  - `LLM_MODEL`：模型名，默认 `gpt-4o-mini`
-- 每条内容生成结构化卡片：`summary`、`what`、`highlights`、`productView`
-- 输出必须是 JSON，经 schema 校验；不合格自动重试，最多 2 次
-- 成本控制：每天最多 8 条、输入截断 2500 字符、按内容哈希缓存、失败时降级为标题 + 摘要
-- API Key 只放在本地 `.env` 或 GitHub Secrets，禁止提交到仓库
+  - `LLM_BASE_URL`：接口地址，当前使用 `https://api.deepseek.com`
+  - `LLM_MODEL`：模型名，当前使用 `deepseek-chat`
+  - `LLM_TIMEOUT_MS`：单次调用总超时，默认 60000
+  - `LLM_CONCURRENCY`：并发数，默认 3
+- 每条内容生成结构化卡片：`title`、`summary`、`what`、`highlights`、`productView`、`readTime`、`topic`
+- 输出必须通过 schema 校验与业务校验；失败自动重试，仍失败则换下一条候选
+- 成本控制：每天最多 8 条、输入截断 2500 字符、3 路并发、按内容哈希可缓存
+- API Key 只存在本地 `.env` 或 GitHub Secret，禁止提交到仓库
 
-## 待确认
+## 9. 产品版本记录
 
-- 每日更新时间（默认 8:00）
-- 是否要邮件 / 微信推送（第二版）
+记录产品能力的里程碑变化；文档本身的改动历史见 Git 提交记录。
+
+| 版本 | 日期 | 产品能力 |
+| --- | --- | --- |
+| v1.0 | 2026-09-12 | 首次上线：8 个信息源、3 条精读 + 5 条速览、手机网页版 |
+| v1.1 | 2026-09-16 | 信息源扩充至 20 个；分类改为 7 个内容主题；新增已发布去重；精读与速览样式区分；排版与可读性优化 |
