@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TouchEvent } from "react";
-import { ArrowUpRight, Bookmark, ChevronLeft, ChevronRight, Flame } from "lucide-react";
+import { ArrowUpRight, Bookmark, ChevronLeft, ChevronRight, Download, Flame } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
 import { SourceTag } from "../components/SourceTag";
 import { ThreeQuestionCard } from "../components/ThreeQuestionCard";
 import { TopBar } from "../components/TopBar";
+import { dateFromItemId, downloadMarkdown, itemFileName, itemToMarkdown } from "../lib/markdown";
 import type { DigestItem } from "../types";
 
 interface DetailPageProps {
@@ -235,10 +236,24 @@ export function DetailPage({
               <p>{item.summary}</p>
             </div>
 
-            <a className="read-original" href={item.sourceUrl} target="_blank" rel="noreferrer">
-              阅读原文
-              <ArrowUpRight size={15} />
-            </a>
+            <div className="detail-actions">
+              <a className="read-original" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                阅读原文
+                <ArrowUpRight size={15} />
+              </a>
+              <button
+                type="button"
+                className="obsidian-btn"
+                aria-label="存入 Obsidian"
+                title="存入 Obsidian"
+                onClick={() => {
+                  const date = dateFromItemId(item.id);
+                  downloadMarkdown(itemFileName(item, date), itemToMarkdown(item, date));
+                }}
+              >
+                <Download size={16} />
+              </button>
+            </div>
 
             <ThreeQuestionCard item={item} />
 

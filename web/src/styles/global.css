@@ -1049,3 +1049,68 @@ a {
     animation: none !important;
   }
 }
+/* ===== Obsidian 导出 ===== */
+
+.filter-bar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-secondary);
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+.icon-btn:hover {
+  background: var(--brand-tint);
+  border-color: var(--brand-tint);
+  color: var(--brand);
+}
+
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
+.detail-actions {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.detail-actions .read-original {
+  flex: 1;
+  margin: 0;
+}
+
+.obsidian-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--brand);
+  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
+}
+
+.obsidian-btn:hover {
+  background: var(--brand-tint);
+  border-color: var(--brand-tint);
+}
+
+.obsidian-btn:active {
+  transform: scale(0.96);
+}

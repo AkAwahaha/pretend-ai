@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import { Download, SlidersHorizontal } from "lucide-react";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
 import type { Category } from "../data/sources";
+import { digestFileName, digestToMarkdown, downloadMarkdown } from "../lib/markdown";
 import type { DailyDigest } from "../types";
 
 const BUILD_ID = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
@@ -62,7 +63,18 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
             <SlidersHorizontal size={14} />
             {category === "全部" ? "筛选" : category}
           </button>
-          <span className="section__count">共 {items.length} 条</span>
+          <div className="filter-bar__right">
+            <span className="section__count">共 {items.length} 条</span>
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label="导出今日日报为 Markdown"
+              title="导出 Markdown（可导入 Obsidian）"
+              onClick={() => downloadMarkdown(digestFileName(digest), digestToMarkdown(digest))}
+            >
+              <Download size={16} />
+            </button>
+          </div>
         </div>
 
         {showFilters ? (
