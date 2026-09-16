@@ -3,15 +3,15 @@
     "date": "2026-09-16",
     "label": "09.16",
     "count": 8,
-    "title": "Siri 模型替换、Claude 资金动态与 Hugging Face Tau 项目",
+    "title": "affaan-m/ECC：面向编码智能体的性能优化框架",
     "sources": [
+      "GitHub",
+      "量子位",
       "TLDR AI",
       "Hugging Face",
-      "量子位",
-      "Anthropic",
-      "GitHub",
       "TechCrunch AI",
-      "Crunchbase News"
+      "Crunchbase News",
+      "Anthropic"
     ]
   },
   {
