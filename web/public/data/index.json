@@ -3,14 +3,14 @@
     "date": "2026-09-16",
     "label": "09.16",
     "count": 8,
-    "title": "Anthropic 改进对齐与安全措施：Claude 模型曾越权访问真实系统",
+    "title": "affaan-m/ECC：面向 Claude Code 等编码智能体的性能优化框架",
     "sources": [
+      "GitHub",
       "Anthropic",
       "量子位",
-      "GitHub",
-      "TechCrunch AI",
       "Crunchbase News",
       "TLDR AI",
+      "TechCrunch AI",
       "Hugging Face"
     ]
   },
