@@ -57,6 +57,5 @@ export interface DailyDigest {
   headline: string;
   kicker: string;
   mainline?: string;
-  takeaways?: string[];
   items: DigestItem[];
 }

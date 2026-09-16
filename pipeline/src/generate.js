@@ -279,11 +279,10 @@ export function createItemId(item, date, index) {
   return item.sourceKey + "-" + date + "-" + index;
 }
 
-export function buildDigest({ date, selected, cards, mainline = "", takeaways = [] }) {
+export function buildDigest({ date, selected, cards, mainline = "" }) {
   return {
     date,
     mainline,
-    takeaways,
     label: date.slice(5).replace("-", "."),
     headline: "今日 AI 日报",
     kicker: "DAILY BRIEF",
