@@ -32,6 +32,14 @@ export function obsidianPath(fileName: string): string {
   return `${OBSIDIAN_FOLDER}/${fileName}`;
 }
 
+function encodeVaultPath(path: string): string {
+  return String(path)
+    .split("/")
+    .filter((segment) => segment.length > 0)
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
 async function requestWithFallback(path: string, init: RequestInit, key: string): Promise<Response> {
   const candidates = activeBase
     ? [activeBase, ...ENDPOINTS.filter((base) => base !== activeBase)]
@@ -73,7 +81,7 @@ export async function saveToObsidian(fileName: string, markdown: string): Promis
   }
   const path = obsidianPath(fileName);
   const response = await requestWithFallback(
-    `/vault/${encodeURIComponent(path)}`,
+    `/vault/${encodeVaultPath(path)}`,
     { method: "PUT", body: markdown, headers: { "Content-Type": "text/markdown; charset=utf-8" } },
     key,
   );
