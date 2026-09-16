@@ -35,6 +35,7 @@ export interface DigestItem {
   sourceUrl: string;
   readTime: string;
   heat?: number;
+  image?: string;
   featured: boolean;
 }
 

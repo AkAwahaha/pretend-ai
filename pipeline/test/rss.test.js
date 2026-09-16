@@ -20,6 +20,24 @@ describe("parseFeed", () => {
     assert.equal(items[0].publishedAt, "2026-09-01T00:00:00Z");
   });
 
+  it("从 enclosure 提取图片", () => {
+    const xml = '<?xml version="1.0"?><rss><channel><item><title>With image</title><link>https://example.com/a</link><enclosure url="https://example.com/a.jpg" type="image/jpeg"/></item></channel></rss>';
+    const items = parseFeed(xml);
+    assert.equal(items[0].image, "https://example.com/a.jpg");
+  });
+
+  it("从正文 img 提取图片", () => {
+    const xml = '<?xml version="1.0"?><rss><channel><item><title>With img</title><link>https://example.com/b</link><description><![CDATA[<p><img src="https://example.com/b.png"/></p>]]></description></item></channel></rss>';
+    const items = parseFeed(xml);
+    assert.equal(items[0].image, "https://example.com/b.png");
+  });
+
+  it("没有图片时返回空字符串", () => {
+    const xml = '<?xml version="1.0"?><rss><channel><item><title>No image</title><link>https://example.com/c</link></item></channel></rss>';
+    const items = parseFeed(xml);
+    assert.equal(items[0].image, "");
+  });
+
   it("过滤缺少标题或链接的条目", () => {
     const xml = "<?xml version=\"1.0\"?><rss><channel><item><title>只有标题</title></item></channel></rss>";
     assert.deepEqual(parseFeed(xml), []);

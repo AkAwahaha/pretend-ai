@@ -824,3 +824,149 @@ body {
   font-size: 11px;
   color: var(--text-muted);
 }
+/* ===== 卡片图文布局与动画 ===== */
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes orbFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes glowDrift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(12px, -10px, 0) scale(1.08);
+  }
+}
+
+.item-card {
+  animation: cardEnter 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--index, 0) * 45ms);
+  transition: box-shadow 220ms ease, transform 220ms ease;
+}
+
+.item-card:active {
+  transform: scale(0.995);
+}
+
+.item-card__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.item-card__thumb {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f1f2f6;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.item-card__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-card__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-card__title {
+  margin: 0;
+}
+
+.item-card__summary {
+  margin: 4px 0 0;
+}
+
+.hero__orb {
+  animation: orbFloat 5.5s ease-in-out infinite;
+}
+
+.detail-head {
+  animation: fadeIn 260ms ease both;
+}
+
+.glow {
+  animation: glowDrift 16s ease-in-out infinite alternate;
+}
+
+.chips {
+  animation: cardEnter 240ms ease both;
+}
+
+.chip,
+.filter-toggle,
+.tab-bar__item,
+.read-original,
+.bookmark-btn,
+.top-bar__btn,
+.detail-nav button {
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease,
+    transform 150ms ease, box-shadow 200ms ease;
+}
+
+.chip:active,
+.tab-bar__item:active,
+.bookmark-btn:active,
+.top-bar__btn:active,
+.detail-nav button:active {
+  transform: scale(0.95);
+}
+
+.read-original:active,
+.filter-toggle:active {
+  transform: scale(0.97);
+}
+
+.read-original:hover {
+  box-shadow: 0 6px 18px rgba(94, 106, 210, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

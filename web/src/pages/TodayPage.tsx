@@ -78,9 +78,10 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
             今日 {items.length} 条 <span className="section__count">按热度排序</span>
           </h2>
           <div className="stack">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <ItemCard
                 key={item.id}
+                index={index}
                 item={item}
                 favorite={isFavorite(item.id)}
                 onToggleFavorite={onToggleFavorite}

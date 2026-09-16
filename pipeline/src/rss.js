@@ -56,6 +56,46 @@ function pickLink(entry) {
   return link["@_href"] ?? text(link);
 }
 
+function pickImage(entry) {
+  const candidates = [];
+
+  for (const item of asArray(entry.enclosure)) {
+    const url = item?.["@_url"];
+    const type = String(item?.["@_type"] ?? "");
+    if (url && (type.startsWith("image") || type.length === 0)) {
+      candidates.push(url);
+    }
+  }
+
+  for (const item of asArray(entry.link)) {
+    const url = item?.["@_href"];
+    const rel = String(item?.["@_rel"] ?? "");
+    const type = String(item?.["@_type"] ?? "");
+    if (url && (rel === "enclosure" || type.startsWith("image"))) {
+      candidates.push(url);
+    }
+  }
+
+  for (const key of ["media:content", "media:thumbnail"]) {
+    for (const item of asArray(entry[key])) {
+      const url = item?.["@_url"];
+      if (url) {
+        candidates.push(url);
+      }
+    }
+  }
+
+  const html = [entry.description, entry.summary, entry.content, entry["content:encoded"]]
+    .map((value) => text(value))
+    .join(" ");
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (match) {
+    candidates.push(match[1]);
+  }
+
+  return candidates.find((url) => typeof url === "string" && /^https?:\/\//.test(url)) ?? "";
+}
+
 export function parseFeed(xml) {
   const document = parser.parse(xml);
   const rssItems = asArray(document?.rss?.channel?.item);
@@ -68,6 +108,7 @@ export function parseFeed(xml) {
       url: pickLink(entry),
       summary: stripHtml(text(entry.description ?? entry.summary ?? entry.content ?? "")),
       publishedAt: text(entry.pubDate ?? entry.updated ?? entry.published ?? ""),
+      image: pickImage(entry),
     }))
     .filter((entry) => entry.title.length > 0 && entry.url.length > 0);
 }

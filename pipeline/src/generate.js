@@ -294,6 +294,7 @@ export function buildDigest({ date, selected, cards }) {
       featured: false,
       heat: Number(item.heat ?? 0),
       sourceUrl: item.url,
+      image: item.image ?? "",
       readTime: cards[index].readTime,
       title: cards[index].title,
       summary: cards[index].summary,

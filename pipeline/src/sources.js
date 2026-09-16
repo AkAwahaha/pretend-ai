@@ -179,6 +179,7 @@ function toRaw(source, entry, index) {
     url: entry.url,
     content: entry.summary || entry.title,
     publishedAt: entry.publishedAt || "",
+    image: entry.image || "",
     rank: typeof index === "number" ? index : 0,
     heat: Number(entry.heat ?? 0),
   };
@@ -244,6 +245,7 @@ export async function fetchSource(source, { fetchTextImpl = fetchText } = {}) {
           url: paper.url ?? (paper.id ? "https://huggingface.co/papers/" + paper.id : source.url),
           summary: paper.summary ?? "",
           publishedAt: paper.publishedAt ?? entry.publishedAt ?? "",
+          image: paper.thumbnail ?? "",
         }, index);
       })
       .filter((item) => item.title);

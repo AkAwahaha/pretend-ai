@@ -1,4 +1,7 @@
+import { useState } from "react";
+import type { CSSProperties } from "react";
 import { Bookmark, Flame } from "lucide-react";
+import { SOURCE_META } from "../data/sources";
 import type { DigestItem } from "../types";
 import { SourceTag } from "./SourceTag";
 
@@ -7,11 +10,16 @@ interface ItemCardProps {
   favorite: boolean;
   onToggleFavorite: (id: string) => void;
   onOpen: (id: string) => void;
+  index?: number;
 }
 
-export function ItemCard({ item, favorite, onToggleFavorite, onOpen }: ItemCardProps) {
+export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0 }: ItemCardProps) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const meta = SOURCE_META[item.source];
+  const showImage = Boolean(item.image) && !imageFailed;
+
   return (
-    <article className="item-card">
+    <article className="item-card" style={{ "--index": index } as CSSProperties}>
       <div className="item-card__head">
         <SourceTag source={item.source} label={item.sourceLabel} />
         <div className="item-card__actions">
@@ -32,12 +40,28 @@ export function ItemCard({ item, favorite, onToggleFavorite, onOpen }: ItemCardP
           </button>
         </div>
       </div>
-      <h3 className="item-card__title">
-        <button type="button" onClick={() => onOpen(item.id)}>
-          {item.title}
-        </button>
-      </h3>
-      <p className="item-card__summary">{item.summary}</p>
+
+      <div className="item-card__body">
+        <div
+          className="item-card__thumb"
+          style={showImage ? undefined : { background: meta?.tint, color: meta?.color }}
+        >
+          {showImage ? (
+            <img src={item.image} alt="" loading="lazy" onError={() => setImageFailed(true)} />
+          ) : (
+            <span>{item.sourceLabel.slice(0, 2)}</span>
+          )}
+        </div>
+        <div className="item-card__text">
+          <h3 className="item-card__title">
+            <button type="button" onClick={() => onOpen(item.id)}>
+              {item.title}
+            </button>
+          </h3>
+          <p className="item-card__summary">{item.summary}</p>
+        </div>
+      </div>
+
       <div className="item-card__meta">
         <span className="topic-chip">{item.category}</span>
         <span className="item-card__time">{item.readTime}</span>
