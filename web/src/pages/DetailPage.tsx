@@ -32,10 +32,8 @@ export function DetailPage({
   const dragDelta = useRef(0);
   const pendingDelta = useRef(0);
   const rafRef = useRef<number | null>(null);
-  const timerRef = useRef<number | null>(null);
 
   const [direction, setDirection] = useState<"next" | "prev">("next");
-  const [phase, setPhase] = useState<"idle" | "out">("idle");
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [imageFailed, setImageFailed] = useState(false);
@@ -67,16 +65,9 @@ export function DetailPage({
         panel.style.removeProperty("transform");
       }
       setDirection(nextDirection);
-      setPhase("out");
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current);
-      }
-      timerRef.current = window.setTimeout(() => {
-        setPhase("idle");
-        dragDelta.current = 0;
-        pendingDelta.current = 0;
-        onNavigate(targetId);
-      }, 110);
+      dragDelta.current = 0;
+      pendingDelta.current = 0;
+      onNavigate(targetId);
     },
     [onNavigate],
   );
@@ -122,9 +113,6 @@ export function DetailPage({
       if (rafRef.current !== null) {
         window.cancelAnimationFrame(rafRef.current);
       }
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current);
-      }
     },
     [],
   );
@@ -139,9 +127,6 @@ export function DetailPage({
   };
 
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    if (phase !== "idle") {
-      return;
-    }
     touchStartX.current = event.touches[0]?.clientX ?? null;
     setDragging(true);
   };
@@ -192,7 +177,7 @@ export function DetailPage({
   return (
     <div
       className="frame frame--detail"
-      data-turning={dragging || phase === "out"}
+      data-turning={dragging}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -222,7 +207,6 @@ export function DetailPage({
           className="detail-panel"
           key={item.id}
           data-direction={direction}
-          data-phase={phase}
           data-dragging={dragging}
         >
           {showImage ? (
