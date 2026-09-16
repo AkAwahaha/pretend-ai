@@ -17,6 +17,7 @@ describe("parseHash", () => {
   it("解析收藏与历史路由", () => {
     expect(parseHash("#/favorites")).toEqual({ name: "favorites" });
     expect(parseHash("#/history")).toEqual({ name: "history" });
+    expect(parseHash("#/notes")).toEqual({ name: "notes" });
   });
 
   it("解析历史某一天", () => {

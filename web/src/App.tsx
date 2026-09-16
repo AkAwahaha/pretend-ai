@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { DetailPage } from "./pages/DetailPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { HistoryPage } from "./pages/HistoryPage";
+import { NotesPage } from "./pages/NotesPage";
 import { TodayPage } from "./pages/TodayPage";
 import { ALL_ITEMS, findDigest } from "./data/mock";
 import { useArchive } from "./hooks/useArchive";
@@ -10,6 +11,7 @@ import { useDigest } from "./hooks/useDigest";
 import { useFavorites } from "./hooks/useFavorites";
 import { useHashRoute } from "./hooks/useHashRoute";
 import { useMastery } from "./hooks/useMastery";
+import { useNotes } from "./hooks/useNotes";
 import { useSearchIndex } from "./hooks/useSearchIndex";
 import { navigate } from "./router";
 import { dateFromItemId } from "./lib/markdown";
@@ -19,6 +21,7 @@ export function App() {
   const route = useHashRoute();
   const { ids, toggle, isFavorite } = useFavorites();
   const { getMastery, setMastery } = useMastery();
+  const { notes, addNote, updateNote, removeNote } = useNotes();
   const { digest } = useDigest();
   const { entries, status: archiveStatus } = useArchive();
   const archiveDate =
@@ -69,6 +72,7 @@ export function App() {
           onBack={goToday}
           mastery={getMastery(item.id)}
           onSetMastery={setMastery}
+          onCreateNote={addNote}
           navIds={navIds}
           onNavigate={(id) => navigate(`/item/${id}`)}
         />
@@ -103,6 +107,18 @@ export function App() {
     );
   }
 
+  if (route.name === "notes") {
+    return (
+      <NotesPage
+        notes={notes}
+        onCreate={(content) => addNote({ content })}
+        onUpdate={updateNote}
+        onRemove={removeNote}
+        onBack={goToday}
+      />
+    );
+  }
+
   if (route.name === "day") {
     const dayDigest = archived ?? findDigest(route.date);
     if (dayDigest) {
@@ -113,6 +129,9 @@ export function App() {
           getMastery={getMastery}
           onToggleFavorite={toggle}
           onSetMastery={setMastery}
+          recentNotes={notes.slice(0, 2)}
+          onCreateNote={(content) => addNote({ content })}
+          onOpenNotes={() => navigate("/notes")}
           onOpen={(id) => openItem(id, dayDigest.items)}
           onBack={goToday}
         />
@@ -127,6 +146,9 @@ export function App() {
       getMastery={getMastery}
       onToggleFavorite={toggle}
       onSetMastery={setMastery}
+      recentNotes={notes.slice(0, 2)}
+      onCreateNote={(content) => addNote({ content })}
+      onOpenNotes={() => navigate("/notes")}
       onOpen={(id) => openItem(id, digest.items)}
     />
   );

@@ -1547,3 +1547,284 @@ a {
   background: #fdf0e3;
   color: #b45309;
 }
+
+/* ===== 我的灵感 ===== */
+
+.inspiration-panel {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(237, 239, 251, 0.86));
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-card);
+}
+
+.inspiration-panel__head,
+.detail-note__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--brand);
+}
+
+.inspiration-panel__title,
+.detail-note__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.inspiration-panel__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.inspiration-panel__recent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--card-border);
+}
+
+.inspiration-note {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.inspiration-note__text {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.inspiration-note__link {
+  flex: 0 0 auto;
+  color: var(--brand);
+  font-size: var(--text-caption);
+}
+
+.note-composer {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+.note-composer--compact {
+  margin-top: var(--space-3);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.note-composer__input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  resize: vertical;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+.note-composer__input::placeholder {
+  color: var(--text-muted);
+}
+
+.note-composer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.note-composer__context {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-composer__submit {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  color: #ffffff;
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.note-composer__submit:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.detail-note {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+.detail-note__saved {
+  margin: var(--space-2) 0 0;
+  color: #0f766e;
+  font-size: var(--text-caption);
+}
+
+.notes-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: var(--space-2) 0 var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #edf0fc, #f7f1ed);
+  color: var(--brand);
+}
+
+.notes-hero__kicker {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.notes-hero__title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-bottom: 78px;
+}
+
+.note-card {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-card);
+}
+
+.note-card__input {
+  display: block;
+  width: 100%;
+  min-height: 72px;
+  resize: vertical;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+.note-card__link,
+.note-card__standalone {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: var(--space-2);
+  color: var(--brand);
+  font-size: var(--text-caption);
+}
+
+.note-card__link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-card__standalone {
+  color: var(--text-muted);
+}
+
+.note-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--card-border);
+}
+
+.note-card__time {
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.note-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.note-card__save,
+.note-card__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-size: var(--text-caption);
+}
+
+.note-card__delete {
+  width: 30px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.note-card__delete:hover {
+  color: #b42318;
+}
+
+.note-composer + .empty-state {
+  padding-top: var(--space-5);
+}
+
+.tab-bar__item span {
+  white-space: nowrap;
+}

@@ -1,12 +1,22 @@
 import { useMemo, useState } from "react";
-import { CircleDot, Compass, Download, Play, SlidersHorizontal } from "lucide-react";
+import {
+  ChevronRight,
+  CircleDot,
+  Compass,
+  Download,
+  Lightbulb,
+  Play,
+  SlidersHorizontal,
+} from "lucide-react";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
+import { NoteComposer } from "../components/NoteComposer";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
 import type { Category } from "../data/sources";
 import type { MasteryState } from "../hooks/useMastery";
+import type { Note } from "../hooks/useNotes";
 import { digestFileName, digestToMarkdown, downloadMarkdown } from "../lib/markdown";
 import type { DailyDigest } from "../types";
 
@@ -18,6 +28,9 @@ interface TodayPageProps {
   getMastery: (id: string) => MasteryState | null;
   onToggleFavorite: (id: string) => void;
   onSetMastery?: (id: string, state: MasteryState) => void;
+  recentNotes?: Note[];
+  onCreateNote?: (content: string) => void;
+  onOpenNotes?: () => void;
   onOpen: (id: string) => void;
   onBack?: () => void;
 }
@@ -28,6 +41,9 @@ export function TodayPage({
   getMastery,
   onToggleFavorite,
   onSetMastery,
+  recentNotes = [],
+  onCreateNote,
+  onOpenNotes,
   onOpen,
   onBack,
 }: TodayPageProps) {
@@ -76,6 +92,50 @@ export function TodayPage({
           </section>
         ) : null}
 
+        {onCreateNote ? (
+          <section className="inspiration-panel">
+            <div className="inspiration-panel__head">
+              <p className="inspiration-panel__title">
+                <Lightbulb size={15} />
+                我的灵感
+              </p>
+              {onOpenNotes ? (
+                <button type="button" className="inspiration-panel__more" onClick={onOpenNotes}>
+                  全部
+                  <ChevronRight size={14} />
+                </button>
+              ) : null}
+            </div>
+
+            <NoteComposer
+              compact
+              onSubmit={onCreateNote}
+              placeholder="记下此刻的想法…"
+              submitLabel="收进灵感"
+            />
+
+            {recentNotes.length > 0 ? (
+              <div className="inspiration-panel__recent">
+                {recentNotes.map((note) => (
+                  <div className="inspiration-note" key={note.id}>
+                    <p className="inspiration-note__text">{note.content}</p>
+                    {note.link ? (
+                      <a
+                        className="inspiration-note__link"
+                        href={note.link.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {note.link.sourceLabel}
+                      </a>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ) : null}
+
         <div className="filter-bar">
           <button
             type="button"
@@ -93,7 +153,7 @@ export function TodayPage({
               type="button"
               className="icon-btn"
               aria-label="导出今日日报为 Markdown"
-              title="导出 Markdown（可导入 Obsidian）"
+              title="导出 Markdown"
               onClick={() => downloadMarkdown(digestFileName(digest), digestToMarkdown(digest))}
             >
               <Download size={16} />

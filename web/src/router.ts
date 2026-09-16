@@ -3,6 +3,7 @@ export type Route =
   | { name: "item"; id: string }
   | { name: "favorites" }
   | { name: "history" }
+  | { name: "notes" }
   | { name: "day"; date: string };
 
 export function parseHash(hash: string): Route {
@@ -17,6 +18,9 @@ export function parseHash(hash: string): Route {
   }
   if (parts[0] === "history") {
     return { name: "history" };
+  }
+  if (parts[0] === "notes") {
+    return { name: "notes" };
   }
   if (parts[0] === "day" && parts[1]) {
     return { name: "day", date: decodeURIComponent(parts[1]) };

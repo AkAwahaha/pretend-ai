@@ -8,12 +8,14 @@ import {
   ChevronRight,
   CircleDot,
   BookOpen,
+  Lightbulb,
   Download,
   FileDown,
   Flame,
   Loader2,
 } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
+import { NoteComposer } from "../components/NoteComposer";
 import { SourceTag } from "../components/SourceTag";
 import { ThreeQuestionCard } from "../components/ThreeQuestionCard";
 import { TopBar } from "../components/TopBar";
@@ -28,6 +30,7 @@ import {
   testObsidianConnection,
 } from "../lib/obsidian";
 import type { MasteryState } from "../hooks/useMastery";
+import type { NoteInput } from "../hooks/useNotes";
 import type { DigestItem } from "../types";
 
 interface DetailPageProps {
@@ -38,9 +41,11 @@ interface DetailPageProps {
   navIds?: string[];
   onNavigate?: (id: string) => void;
   mastery?: MasteryState | null;
+  onCreateNote?: (input: NoteInput) => unknown;
   onSetMastery?: (id: string, state: MasteryState) => void;
 }
 
+const SHOW_OBSIDIAN = false;
 const MAX_DRAG = 200;
 const TURN_RATIO = 220;
 
@@ -52,6 +57,7 @@ export function DetailPage({
   navIds = [],
   onNavigate,
   mastery = null,
+  onCreateNote,
   onSetMastery,
 }: DetailPageProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -68,6 +74,7 @@ export function DetailPage({
   const [obsidianMessage, setObsidianMessage] = useState("");
   const [showKeyPanel, setShowKeyPanel] = useState(false);
   const [keyInput, setKeyInput] = useState("");
+  const [noteSaved, setNoteSaved] = useState(false);
 
   const index = navIds.indexOf(item.id);
   const prevId = index > 0 ? navIds[index - 1] : undefined;
@@ -148,6 +155,7 @@ export function DetailPage({
   useEffect(() => {
     setObsidianState("idle");
     setObsidianMessage("");
+    setNoteSaved(false);
   }, [item.id]);
 
   useEffect(
@@ -353,21 +361,51 @@ export function DetailPage({
               </div>
             ) : null}
 
+            {onCreateNote ? (
+              <section className="detail-note">
+                <div className="detail-note__head">
+                  <Lightbulb size={15} />
+                  <span>记下灵感</span>
+                </div>
+                <NoteComposer
+                  compact
+                  placeholder="这条内容让你想到什么？"
+                  submitLabel="保存灵感"
+                  contextLabel={`关联：${item.title}`}
+                  onSubmit={(content) => {
+                    onCreateNote({
+                      content,
+                      link: {
+                        itemId: item.id,
+                        title: item.title,
+                        sourceLabel: item.sourceLabel,
+                        sourceUrl: item.sourceUrl,
+                        date,
+                      },
+                    });
+                    setNoteSaved(true);
+                  }}
+                />
+                {noteSaved ? <p className="detail-note__saved">已保存到「我的灵感」</p> : null}
+              </section>
+            ) : null}
             <div className="detail-actions">
               <a className="read-original" href={item.sourceUrl} target="_blank" rel="noreferrer">
                 阅读原文
                 <ArrowUpRight size={15} />
               </a>
-              <button
-                type="button"
-                className="obsidian-btn"
-                aria-label="存入 Obsidian"
-                title="存入 Obsidian 的 raw 文件夹"
-                disabled={obsidianState === "saving"}
-                onClick={handleSaveToObsidian}
-              >
-                {obsidianState === "saving" ? <Loader2 size={16} className="spin" /> : <FileDown size={16} />}
-              </button>
+              {SHOW_OBSIDIAN ? (
+                <button
+                  type="button"
+                  className="obsidian-btn"
+                  aria-label="存入 Obsidian"
+                  title="存入 Obsidian 的 raw 文件夹"
+                  disabled={obsidianState === "saving"}
+                  onClick={handleSaveToObsidian}
+                >
+                  {obsidianState === "saving" ? <Loader2 size={16} className="spin" /> : <FileDown size={16} />}
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="obsidian-btn"
@@ -379,39 +417,43 @@ export function DetailPage({
               </button>
             </div>
 
-            <button type="button" className="obsidian-uri-btn" onClick={handleOpenInObsidian}>
-              <BookOpen size={15} />
-              在 Obsidian 中打开（手机可用）
-            </button>
+            {SHOW_OBSIDIAN ? (
+              <>
+                <button type="button" className="obsidian-uri-btn" onClick={handleOpenInObsidian}>
+                  <BookOpen size={15} />
+                  在 Obsidian 中打开（手机可用）
+                </button>
 
-            {obsidianMessage ? (
-              <p className={obsidianState === "error" ? "obsidian-status obsidian-status--error" : "obsidian-status"}>
-                {obsidianMessage}
-              </p>
-            ) : null}
+                {obsidianMessage ? (
+                  <p className={obsidianState === "error" ? "obsidian-status obsidian-status--error" : "obsidian-status"}>
+                    {obsidianMessage}
+                  </p>
+                ) : null}
 
-            {showKeyPanel ? (
-              <div className="obsidian-panel">
-                <p className="obsidian-panel__title">填入 Obsidian API Key</p>
-                <p className="obsidian-panel__hint">
-                  在 Obsidian 里打开「设置 → Local REST API」复制 API Key，粘贴到下面。它只保存在这台设备的浏览器里，不会上传。
-                </p>
-                <input
-                  className="obsidian-panel__input"
-                  type="password"
-                  placeholder="粘贴 API Key"
-                  value={keyInput}
-                  onChange={(event) => setKeyInput(event.target.value)}
-                />
-                <div className="obsidian-panel__actions">
-                  <button type="button" className="btn-primary" onClick={handleSaveKey}>
-                    保存并测试连接
-                  </button>
-                  <button type="button" className="btn-ghost" onClick={() => setShowKeyPanel(false)}>
-                    取消
-                  </button>
-                </div>
-              </div>
+                {showKeyPanel ? (
+                  <div className="obsidian-panel">
+                    <p className="obsidian-panel__title">填入 Obsidian API Key</p>
+                    <p className="obsidian-panel__hint">
+                      在 Obsidian 里打开「设置 → Local REST API」复制 API Key，粘贴到下面。它只保存在这台设备的浏览器里，不会上传。
+                    </p>
+                    <input
+                      className="obsidian-panel__input"
+                      type="password"
+                      placeholder="粘贴 API Key"
+                      value={keyInput}
+                      onChange={(event) => setKeyInput(event.target.value)}
+                    />
+                    <div className="obsidian-panel__actions">
+                      <button type="button" className="btn-primary" onClick={handleSaveKey}>
+                        保存并测试连接
+                      </button>
+                      <button type="button" className="btn-ghost" onClick={() => setShowKeyPanel(false)}>
+                        取消
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : null}
 
             <ThreeQuestionCard item={item} />

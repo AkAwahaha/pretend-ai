@@ -39,6 +39,26 @@ describe("TodayPage", () => {
     expect(screen.queryByText(TODAY_DIGEST.items[0].title)).not.toBeInTheDocument();
   });
 
+  it("可以在首页快速记录灵感", () => {
+    const onCreateNote = vi.fn();
+    render(
+      <TodayPage
+        digest={TODAY_DIGEST}
+        isFavorite={() => false}
+        getMastery={() => null}
+        onToggleFavorite={vi.fn()}
+        onCreateNote={onCreateNote}
+        onOpen={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("记下此刻的想法…"), {
+      target: { value: "首页记录的想法" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "收进灵感" }));
+
+    expect(onCreateNote).toHaveBeenCalledWith("首页记录的想法");
+  });
   it("点击标题会打开详情", () => {
     const { onOpen } = renderTodayPage();
 
