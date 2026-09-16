@@ -1,6 +1,14 @@
 import { postJson } from "./http.js";
 
-export const CATEGORIES = ["一手官方", "省时日报", "前沿论文", "项目发现", "商业视角"];
+export const TOPICS = [
+  "模型技术快讯",
+  "商业资本动态",
+  "算力硬件上游",
+  "行业应用落地",
+  "政策监管治理",
+  "开源开发者生态",
+  "深度观点与趋势分析",
+];
 
 export function getLlmConfig(env = process.env) {
   const apiKey = env.LLM_API_KEY || env.OPENAI_API_KEY || "";
@@ -18,7 +26,8 @@ export function buildPrompt(item) {
     "把一条 AI 资讯或开源项目，整理成可以直接用于面试准备的结构化卡片。",
     "要求：所有字段必须用简体中文输出；不堆砌形容词；说清楚它解决了什么问题、亮点和实现思路在哪、产品经理应该怎么理解。",
     "英文原文必须翻译成中文；只有公司名、产品名、模型名和开源仓库名可以保留英文，且必须放在中文语境里，不得出现整句英文。",
-    "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime}。",
+    "只输出 JSON，不要输出解释文字。JSON 结构：{title, summary, what, highlights, productView, readTime, topic}。",
+    "topic 必须从以下分类里选最贴切的一个：模型技术快讯 / 商业资本动态 / 算力硬件上游 / 行业应用落地 / 政策监管治理 / 开源开发者生态 / 深度观点与趋势分析。",
     "title 用中文概括；开源项目保留 owner/repo，其余英文标题必须翻译。",
     "readTime 用「X 分钟」格式。",
     "summary 用 80-120 字完整说清这条内容；what 2-3 句；highlights 3-4 句，把实现思路讲透；productView 3-4 句，要落到产品判断或面试表达。",
@@ -57,13 +66,22 @@ export function normalizeReadTime(value) {
   return match[1] + " 分钟";
 }
 
+export function normalizeTopic(value) {
+  const text = String(value ?? "").trim();
+  if (TOPICS.includes(text)) {
+    return text;
+  }
+  const partial = TOPICS.find((topic) => text.includes(topic) || topic.includes(text));
+  return partial ?? "模型技术快讯";
+}
+
 function hasUntranslatedEnglish(value) {
   return /[A-Za-z][A-Za-z0-9\s,.-]{29,}/.test(String(value));
 }
 
 export function validateCard(value) {
   const errors = [];
-  const fields = ["title", "summary", "what", "highlights", "productView"];
+  const fields = ["title", "summary", "what", "highlights", "productView", "topic"];
   for (const field of fields) {
     if (typeof value?.[field] !== "string" || value[field].trim().length === 0) {
       errors.push("缺少字段：" + field);
@@ -143,6 +161,7 @@ export async function summarizeItem(item, { config, postJsonImpl = postJson, ret
         highlights: parsed.highlights.trim(),
         productView: parsed.productView.trim(),
         readTime: normalizeReadTime(parsed.readTime),
+        topic: normalizeTopic(parsed.topic),
       };
     } catch (error) {
       lastError = error;

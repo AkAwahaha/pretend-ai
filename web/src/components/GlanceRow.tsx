@@ -13,7 +13,10 @@ export function GlanceRow({ item, favorite, onToggleFavorite, onOpen }: GlanceRo
   return (
     <article className="glance-row">
       <div className="glance-row__body">
-        <SourceTag source={item.source} label={item.sourceLabel} variant="text" />
+        <div className="glance-row__head">
+          <SourceTag source={item.source} label={item.sourceLabel} variant="text" />
+          <span className="topic-chip topic-chip--mini">{item.category}</span>
+        </div>
         <h3 className="glance-row__title">
           <button type="button" onClick={() => onOpen(item.id)}>
             {item.title}

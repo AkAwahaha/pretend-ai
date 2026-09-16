@@ -21,15 +21,15 @@ describe("TodayPage", () => {
   it("渲染精读与速览分区", () => {
     renderTodayPage();
 
-    expect(screen.getByText("精读")).toBeInTheDocument();
-    expect(screen.getByText("速览")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /精读/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /速览/ })).toBeInTheDocument();
     expect(screen.getByText(TODAY_DIGEST.items[0].title)).toBeInTheDocument();
   });
 
   it("按分类筛选内容", () => {
     renderTodayPage();
 
-    fireEvent.click(screen.getByRole("tab", { name: "项目发现" }));
+    fireEvent.click(screen.getByRole("tab", { name: "开源开发者生态" }));
 
     expect(screen.getByText("agent-memory：给 Agent 加一层长期记忆")).toBeInTheDocument();
     expect(screen.queryByText(TODAY_DIGEST.items[0].title)).not.toBeInTheDocument();

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildPrompt, extractJson, getLlmConfig, summarizeItem, validateCard } from "../src/llm.js";
+import { buildPrompt, extractJson, getLlmConfig, normalizeTopic, summarizeItem, validateCard } from "../src/llm.js";
 
 const rawItem = {
   sourceKey: "openai",
@@ -47,8 +47,20 @@ describe("validateCard", () => {
       what: "C",
       highlights: "D",
       productView: "E",
+      topic: "模型技术快讯",
     });
     assert.equal(result.ok, true);
+  });
+});
+
+describe("normalizeTopic", () => {
+  it("识别合法分类", () => {
+    assert.equal(normalizeTopic("商业资本动态"), "商业资本动态");
+  });
+
+  it("把未知分类兜底为模型技术快讯", () => {
+    assert.equal(normalizeTopic("随便写的分类"), "模型技术快讯");
+    assert.equal(normalizeTopic(""), "模型技术快讯");
   });
 });
 
@@ -77,6 +89,7 @@ describe("summarizeItem", () => {
               highlights: "亮点",
               productView: "产品视角",
               readTime: "2 min",
+              topic: "模型技术快讯",
             }),
           },
         },

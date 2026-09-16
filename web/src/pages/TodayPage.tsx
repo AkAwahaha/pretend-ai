@@ -53,7 +53,7 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
         {featured.length > 0 ? (
           <section className="section">
             <h2 className="section__title">
-              精读 <span className="section__count">{featured.length} 条</span>
+              精读 <span className="section__count">{featured.length} 条 · 完整拆解</span>
             </h2>
             <div className="stack">
               {featured.map((item) => (
@@ -72,9 +72,9 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
         {glance.length > 0 ? (
           <section className="section">
             <h2 className="section__title">
-              速览 <span className="section__count">{glance.length} 条</span>
+              速览 <span className="section__count">{glance.length} 条 · 快速扫过</span>
             </h2>
-            <div className="stack">
+            <div className="stack stack--list">
               {glance.map((item) => (
                 <GlanceRow
                   key={item.id}

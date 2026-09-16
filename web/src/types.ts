@@ -26,6 +26,7 @@ export interface DigestItem {
   source: SourceKey;
   sourceLabel: string;
   category: string;
+  sourceCategory?: string;
   title: string;
   summary: string;
   what: string;

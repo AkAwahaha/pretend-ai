@@ -12,14 +12,20 @@ interface DeepCardProps {
 export function DeepCard({ item, favorite, onToggleFavorite, onOpen }: DeepCardProps) {
   return (
     <article className="deep-card">
-      <SourceTag source={item.source} label={item.sourceLabel} />
+      <div className="deep-card__head">
+        <SourceTag source={item.source} label={item.sourceLabel} />
+        <span className="deep-card__badge">精读</span>
+      </div>
       <h3 className="deep-card__title">
         <button type="button" onClick={() => onOpen(item.id)}>
           {item.title}
         </button>
       </h3>
       <p className="deep-card__summary">{item.summary}</p>
-      <p className="deep-card__footer">亮点 · 思路 · 产品视角</p>
+      <div className="deep-card__meta">
+        <span className="topic-chip">{item.category}</span>
+        <span className="deep-card__footer">亮点 · 思路 · 产品视角</span>
+      </div>
       <button
         type="button"
         aria-label={favorite ? "取消收藏" : "收藏"}

@@ -26,13 +26,13 @@ export const SOURCE_META: Record<SourceKey, { label: string; color: string; tint
 
 export const CATEGORIES = [
   "全部",
-  "一手官方",
-  "国内动态",
-  "行业新闻",
-  "项目发现",
-  "省时日报",
-  "商业视角",
-  "前沿论文",
+  "模型技术快讯",
+  "商业资本动态",
+  "算力硬件上游",
+  "行业应用落地",
+  "政策监管治理",
+  "开源开发者生态",
+  "深度观点与趋势分析",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
