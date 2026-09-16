@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, TouchEvent } from "react";
-import { Bookmark, ChevronLeft, ChevronRight, ExternalLink, Flame } from "lucide-react";
+import { ArrowUpRight, Bookmark, ChevronLeft, ChevronRight, Flame } from "lucide-react";
 import { GlowBackground } from "../components/GlowBackground";
 import { SourceTag } from "../components/SourceTag";
 import { ThreeQuestionCard } from "../components/ThreeQuestionCard";
@@ -27,6 +27,10 @@ export function DetailPage({
   const touchStartX = useRef<number | null>(null);
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [imageFailed, setImageFailed] = useState(false);
+
   const index = navIds.indexOf(item.id);
   const prevId = index > 0 ? navIds[index - 1] : undefined;
   const nextId = index >= 0 && index < navIds.length - 1 ? navIds[index + 1] : undefined;
@@ -58,8 +62,20 @@ export function DetailPage({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [goPrev, goNext]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      const element = document.documentElement;
+      const max = element.scrollHeight - element.clientHeight;
+      setProgress(max > 0 ? Math.min(1, Math.max(0, element.scrollTop / max)) : 0);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [item.id]);
+
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;
+    setDragging(true);
   };
 
   const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
@@ -68,12 +84,13 @@ export function DetailPage({
     }
     const current = event.touches[0]?.clientX ?? touchStartX.current;
     const delta = current - touchStartX.current;
-    setDragX(Math.max(-90, Math.min(90, delta)));
+    setDragX(Math.max(-140, Math.min(140, delta)));
   };
 
   const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
     const start = touchStartX.current;
     touchStartX.current = null;
+    setDragging(false);
     setDragX(0);
     if (start === null) {
       return;
@@ -90,8 +107,18 @@ export function DetailPage({
     }
   };
 
+  const showImage = Boolean(item.image) && !imageFailed;
+
   return (
-    <div className="frame" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+    <div
+      className="frame frame--detail"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="reading-progress">
+        <span style={{ transform: `scaleX(${progress})` }} />
+      </div>
       <GlowBackground />
       <div className="content">
         <TopBar
@@ -113,9 +140,15 @@ export function DetailPage({
           className="detail-panel"
           key={item.id}
           data-direction={direction}
+          data-dragging={dragging}
           style={dragX ? ({ transform: `translateX(${dragX}px)` } as CSSProperties) : undefined}
         >
-          <div className="detail-strip" />
+          {showImage ? (
+            <div className="detail-banner">
+              <img src={item.image} alt="" loading="lazy" onError={() => setImageFailed(true)} />
+              <span className="detail-banner__fade" />
+            </div>
+          ) : null}
 
           <div className="detail-head">
             <div className="detail-meta">
@@ -131,17 +164,19 @@ export function DetailPage({
             </div>
 
             <h1 className="detail-title">{item.title}</h1>
-            <p className="detail-summary">{item.summary}</p>
+
+            <div className="detail-quote">
+              <p>{item.summary}</p>
+            </div>
 
             <a className="read-original" href={item.sourceUrl} target="_blank" rel="noreferrer">
-              <ExternalLink size={15} />
               阅读原文
+              <ArrowUpRight size={15} />
             </a>
 
             <ThreeQuestionCard item={item} />
 
             <a className="source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
-              <ExternalLink size={14} />
               {item.sourceUrl}
             </a>
           </div>
@@ -162,6 +197,8 @@ export function DetailPage({
             </button>
           </div>
         ) : null}
+
+        {navIds.length > 1 ? <p className="swipe-hint">左右滑动切换上一条 / 下一条</p> : null}
       </div>
     </div>
   );
