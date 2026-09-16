@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CSSProperties } from "react";
-import { Bookmark, Check, Flame } from "lucide-react";
+import { Bookmark, Check, CircleDot, Flame } from "lucide-react";
+import type { MasteryState } from "../hooks/useMastery";
 import type { DigestItem } from "../types";
 import { SourceTag } from "./SourceTag";
 
@@ -10,10 +11,10 @@ interface ItemCardProps {
   onToggleFavorite: (id: string) => void;
   onOpen: (id: string) => void;
   index?: number;
-  read?: boolean;
+  mastery?: MasteryState | null;
 }
 
-export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0, read = false }: ItemCardProps) {
+export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0, mastery = null }: ItemCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const showImage = Boolean(item.image) && !imageFailed;
 
@@ -22,10 +23,16 @@ export function ItemCard({ item, favorite, onToggleFavorite, onOpen, index = 0, 
       <div className="item-card__head">
         <div className="item-card__tags">
           <SourceTag source={item.source} label={item.sourceLabel} />
-          {read ? (
-            <span className="read-badge">
+          {mastery === "mastered" ? (
+            <span className="mastery-badge mastery-badge--done">
               <Check size={11} />
-              已读
+              已掌握
+            </span>
+          ) : null}
+          {mastery === "unmastered" ? (
+            <span className="mastery-badge mastery-badge--todo">
+              <CircleDot size={11} />
+              未掌握
             </span>
           ) : null}
         </div>

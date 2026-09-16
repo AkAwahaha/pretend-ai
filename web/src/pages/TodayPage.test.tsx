@@ -10,7 +10,7 @@ function renderTodayPage() {
     <TodayPage
       digest={TODAY_DIGEST}
       isFavorite={() => false}
-      isRead={() => false}
+      getMastery={() => null}
       onToggleFavorite={onToggleFavorite}
       onOpen={onOpen}
     />,

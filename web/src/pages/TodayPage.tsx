@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { CheckCircle2, Compass, Download, Play, SlidersHorizontal } from "lucide-react";
+import { CheckCircle2, CircleDot, Compass, Download, Play, SlidersHorizontal } from "lucide-react";
 import { FilterChips } from "../components/FilterChips";
 import { GlowBackground } from "../components/GlowBackground";
 import { ItemCard } from "../components/ItemCard";
 import { TabBar } from "../components/TabBar";
 import { TopBar } from "../components/TopBar";
 import type { Category } from "../data/sources";
+import type { MasteryState } from "../hooks/useMastery";
 import { digestFileName, digestToMarkdown, downloadMarkdown } from "../lib/markdown";
 import type { DailyDigest } from "../types";
 
@@ -14,17 +15,19 @@ const BUILD_ID = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 interface TodayPageProps {
   digest: DailyDigest;
   isFavorite: (id: string) => boolean;
-  isRead: (id: string) => boolean;
+  getMastery: (id: string) => MasteryState | null;
   onToggleFavorite: (id: string) => void;
   onOpen: (id: string) => void;
   onBack?: () => void;
 }
 
-export function TodayPage({ digest, isFavorite, isRead, onToggleFavorite, onOpen, onBack }: TodayPageProps) {
+export function TodayPage({ digest, isFavorite, getMastery, onToggleFavorite, onOpen, onBack }: TodayPageProps) {
   const [category, setCategory] = useState<Category>("全部");
   const [showFilters, setShowFilters] = useState(false);
 
-  const readCount = digest.items.filter((item) => isRead(item.id)).length;
+  const masteredCount = digest.items.filter((item) => getMastery(item.id) === "mastered").length;
+  const unmasteredItems = digest.items.filter((item) => getMastery(item.id) === "unmastered");
+  const unmarkedItems = digest.items.filter((item) => getMastery(item.id) === null);
   const items = useMemo(
     () => (category === "全部" ? digest.items : digest.items.filter((item) => item.category === category)),
     [digest.items, category],
@@ -108,29 +111,33 @@ export function TodayPage({ digest, isFavorite, isRead, onToggleFavorite, onOpen
               <div className="read-progress__bar">
                 <span
                   style={{
-                    transform: `scaleX(${digest.items.length > 0 ? readCount / digest.items.length : 0})`,
+                    transform: `scaleX(${digest.items.length > 0 ? masteredCount / digest.items.length : 0})`,
                   }}
                 />
               </div>
               <span className="read-progress__label">
-                已读 {readCount}/{digest.items.length}
+                已掌握 {masteredCount}/{digest.items.length}
               </span>
             </div>
           ) : null}
-          {category === "全部" && readCount < digest.items.length ? (
+          {category === "全部" && unmasteredItems.length > 0 ? (
             <button
               type="button"
               className="continue-btn"
-              onClick={() => {
-                const next = digest.items.find((item) => !isRead(item.id));
-                if (next) {
-                  onOpen(next.id);
-                }
-              }}
+              onClick={() => onOpen(unmasteredItems[0].id)}
             >
-              <Play size={14} />
-              继续阅读 · 还有 {digest.items.length - readCount} 条未读
+              <CircleDot size={14} />
+              复习未掌握 · {unmasteredItems.length} 条
             </button>
+          ) : null}
+          {category === "全部" && unmasteredItems.length === 0 && unmarkedItems.length > 0 ? (
+            <button type="button" className="continue-btn" onClick={() => onOpen(unmarkedItems[0].id)}>
+              <Play size={14} />
+              继续学习 · 还有 {unmarkedItems.length} 条未标记
+            </button>
+          ) : null}
+          {category === "全部" && unmasteredItems.length === 0 && unmarkedItems.length === 0 ? (
+            <p className="mastery-done">今日 {digest.items.length} 条已全部掌握</p>
           ) : null}
           <div className="stack">
             {items.map((item, index) => (

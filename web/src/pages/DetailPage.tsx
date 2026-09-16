@@ -3,8 +3,10 @@ import type { TouchEvent } from "react";
 import {
   ArrowUpRight,
   Bookmark,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  CircleDot,
   BookOpen,
   Download,
   FileDown,
@@ -26,6 +28,7 @@ import {
   setObsidianKey,
   testObsidianConnection,
 } from "../lib/obsidian";
+import type { MasteryState } from "../hooks/useMastery";
 import type { DigestItem } from "../types";
 
 interface DetailPageProps {
@@ -35,7 +38,8 @@ interface DetailPageProps {
   onBack: () => void;
   navIds?: string[];
   onNavigate?: (id: string) => void;
-  onRead?: (id: string) => void;
+  mastery?: MasteryState | null;
+  onSetMastery?: (id: string, state: MasteryState) => void;
 }
 
 const MAX_DRAG = 200;
@@ -48,7 +52,8 @@ export function DetailPage({
   onBack,
   navIds = [],
   onNavigate,
-  onRead,
+  mastery = null,
+  onSetMastery,
 }: DetailPageProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const touchStartX = useRef<number | null>(null);
@@ -139,9 +144,7 @@ export function DetailPage({
     return () => window.removeEventListener("scroll", onScroll);
   }, [item.id]);
 
-  useEffect(() => {
-    onRead?.(item.id);
-  }, [item.id, onRead]);
+
 
   useEffect(() => {
     setObsidianState("idle");
@@ -381,6 +384,29 @@ export function DetailPage({
             ) : null}
 
             <ThreeQuestionCard item={item} />
+
+            {onSetMastery ? (
+              <div className="mastery-actions">
+                <button
+                  type="button"
+                  className={mastery === "mastered" ? "mastery-btn mastery-btn--done" : "mastery-btn"}
+                  aria-pressed={mastery === "mastered"}
+                  onClick={() => onSetMastery(item.id, "mastered")}
+                >
+                  <CheckCircle2 size={15} />
+                  已掌握
+                </button>
+                <button
+                  type="button"
+                  className={mastery === "unmastered" ? "mastery-btn mastery-btn--todo" : "mastery-btn"}
+                  aria-pressed={mastery === "unmastered"}
+                  onClick={() => onSetMastery(item.id, "unmastered")}
+                >
+                  <CircleDot size={15} />
+                  未掌握
+                </button>
+              </div>
+            ) : null}
 
             {item.terms && item.terms.length > 0 ? (
               <section className="terms">
