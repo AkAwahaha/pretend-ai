@@ -8,6 +8,8 @@ import { TopBar } from "../components/TopBar";
 import type { Category } from "../data/sources";
 import type { DailyDigest } from "../types";
 
+const BUILD_ID = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
+
 interface TodayPageProps {
   digest: DailyDigest;
   isFavorite: (id: string) => boolean;
@@ -46,7 +48,7 @@ export function TodayPage({ digest, isFavorite, onToggleFavorite, onOpen, onBack
             </div>
             <div className="hero__orb" aria-hidden="true" />
           </div>
-          <p className="hero__meta">用产品视野看 AI · 每日更新 · v1.3</p>
+          <p className="hero__meta">用产品视野看 AI · 每日更新 · {BUILD_ID}</p>
         </section>
 
         <div className="filter-bar">
