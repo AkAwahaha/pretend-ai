@@ -361,34 +361,6 @@ export function DetailPage({
               </div>
             ) : null}
 
-            {onCreateNote ? (
-              <section className="detail-note">
-                <div className="detail-note__head">
-                  <Lightbulb size={15} />
-                  <span>记下灵感</span>
-                </div>
-                <NoteComposer
-                  compact
-                  placeholder="这条内容让你想到什么？"
-                  submitLabel="保存灵感"
-                  contextLabel={`关联：${item.title}`}
-                  onSubmit={(content) => {
-                    onCreateNote({
-                      content,
-                      link: {
-                        itemId: item.id,
-                        title: item.title,
-                        sourceLabel: item.sourceLabel,
-                        sourceUrl: item.sourceUrl,
-                        date,
-                      },
-                    });
-                    setNoteSaved(true);
-                  }}
-                />
-                {noteSaved ? <p className="detail-note__saved">已保存到「我的灵感」</p> : null}
-              </section>
-            ) : null}
             <div className="detail-actions">
               <a className="read-original" href={item.sourceUrl} target="_blank" rel="noreferrer">
                 阅读原文
@@ -463,6 +435,36 @@ export function DetailPage({
             <a className="source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
               {item.sourceUrl}
             </a>
+
+            {onCreateNote ? (
+              <section className="detail-note">
+                <div className="detail-note__head">
+                  <Lightbulb size={15} />
+                  <span>记下灵感</span>
+                </div>
+                <NoteComposer
+                  compact
+                  placeholder="这条内容让你想到什么？"
+                  submitLabel="保存灵感"
+                  contextLabel={`关联：${item.title}`}
+                  onSubmit={(content) => {
+                    onCreateNote({
+                      content,
+                      link: {
+                        itemId: item.id,
+                        title: item.title,
+                        sourceLabel: item.sourceLabel,
+                        sourceUrl: item.sourceUrl,
+                        date,
+                      },
+                    });
+                    setNoteSaved(true);
+                  }}
+                />
+                {noteSaved ? <p className="detail-note__saved">已保存到「我的灵感」</p> : null}
+              </section>
+            ) : null}
+
           </div>
         </div>
 
