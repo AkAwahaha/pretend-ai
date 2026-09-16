@@ -354,8 +354,8 @@ export function DetailPage({
                 {mastery ? (
                   <p className={`mastery-status mastery-status--${mastery}`}>
                     {mastery === "mastered"
-                      ? "已掌握：首页进度会更新，且不会进入复习列表"
-                      : "未掌握：已加入复习列表，下次可以从首页继续"}
+                      ? "已掌握：已处理完成，不会进入复习队列"
+                      : "未掌握：已进入复习队列，直到改为已掌握"}
                   </p>
                 ) : null}
               </div>

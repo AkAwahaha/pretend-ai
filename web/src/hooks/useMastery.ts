@@ -42,14 +42,7 @@ export function useMastery() {
   }, [states]);
 
   const setMastery = useCallback((id: string, state: MasteryState) => {
-    setStates((prev) => {
-      if (prev[id] === state) {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      }
-      return { ...prev, [id]: state };
-    });
+    setStates((prev) => ({ ...prev, [id]: state }));
   }, []);
 
   const getMastery = useCallback((id: string): MasteryState | null => states[id] ?? null, [states]);

@@ -132,7 +132,7 @@ export function App() {
           recentNotes={notes.slice(0, 2)}
           onCreateNote={(content) => addNote({ content })}
           onOpenNotes={() => navigate("/notes")}
-          onOpen={(id) => openItem(id, dayDigest.items)}
+          onOpen={(id, list) => openItem(id, list ?? dayDigest.items)}
           onBack={goToday}
         />
       );
@@ -149,7 +149,7 @@ export function App() {
       recentNotes={notes.slice(0, 2)}
       onCreateNote={(content) => addNote({ content })}
       onOpenNotes={() => navigate("/notes")}
-      onOpen={(id) => openItem(id, digest.items)}
+      onOpen={(id, list) => openItem(id, list ?? digest.items)}
     />
   );
 }

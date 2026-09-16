@@ -1828,3 +1828,17 @@ a {
 .tab-bar__item span {
   white-space: nowrap;
 }
+
+.continue-btn--review {
+  background: #fdf0e3;
+  color: #b45309;
+}
+
+.continue-btn--review:hover {
+  background: #f9e5cf;
+}
+
+.mastery-done--review {
+  background: #fdf0e3;
+  color: #b45309;
+}

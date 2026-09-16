@@ -18,7 +18,7 @@ import type { Category } from "../data/sources";
 import type { MasteryState } from "../hooks/useMastery";
 import type { Note } from "../hooks/useNotes";
 import { digestFileName, digestToMarkdown, downloadMarkdown } from "../lib/markdown";
-import type { DailyDigest } from "../types";
+import type { DailyDigest, DigestItem } from "../types";
 
 const BUILD_ID = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 
@@ -31,7 +31,7 @@ interface TodayPageProps {
   recentNotes?: Note[];
   onCreateNote?: (content: string) => void;
   onOpenNotes?: () => void;
-  onOpen: (id: string) => void;
+  onOpen: (id: string, list?: DigestItem[]) => void;
   onBack?: () => void;
 }
 
@@ -53,6 +53,7 @@ export function TodayPage({
   const masteredCount = digest.items.filter((item) => getMastery(item.id) === "mastered").length;
   const unmasteredItems = digest.items.filter((item) => getMastery(item.id) === "unmastered");
   const unmarkedItems = digest.items.filter((item) => getMastery(item.id) === null);
+  const processedCount = masteredCount + unmasteredItems.length;
   const items = useMemo(
     () => (category === "全部" ? digest.items : digest.items.filter((item) => item.category === category)),
     [digest.items, category],
@@ -180,33 +181,43 @@ export function TodayPage({
               <div className="read-progress__bar">
                 <span
                   style={{
-                    transform: `scaleX(${digest.items.length > 0 ? masteredCount / digest.items.length : 0})`,
+                    transform: `scaleX(${digest.items.length > 0 ? processedCount / digest.items.length : 0})`,
                   }}
                 />
               </div>
               <span className="read-progress__label">
-                已掌握 {masteredCount}/{digest.items.length}
+                已处理 {processedCount}/{digest.items.length}
+                {unmasteredItems.length > 0 ? ` · 待复习 ${unmasteredItems.length}` : ""}
               </span>
             </div>
+          ) : null}
+          {category === "全部" && unmarkedItems.length > 0 ? (
+            <button
+              type="button"
+              className="continue-btn"
+              onClick={() => onOpen(unmarkedItems[0].id, unmarkedItems)}
+            >
+              <Play size={14} />
+              继续学习 · 还有 {unmarkedItems.length} 条未标记
+            </button>
           ) : null}
           {category === "全部" && unmasteredItems.length > 0 ? (
             <button
               type="button"
-              className="continue-btn"
-              onClick={() => onOpen(unmasteredItems[0].id)}
+              className="continue-btn continue-btn--review"
+              onClick={() => onOpen(unmasteredItems[0].id, unmasteredItems)}
             >
               <CircleDot size={14} />
               复习未掌握 · {unmasteredItems.length} 条
             </button>
           ) : null}
-          {category === "全部" && unmasteredItems.length === 0 && unmarkedItems.length > 0 ? (
-            <button type="button" className="continue-btn" onClick={() => onOpen(unmarkedItems[0].id)}>
-              <Play size={14} />
-              继续学习 · 还有 {unmarkedItems.length} 条未标记
-            </button>
-          ) : null}
-          {category === "全部" && unmasteredItems.length === 0 && unmarkedItems.length === 0 ? (
+          {category === "全部" && unmarkedItems.length === 0 && unmasteredItems.length === 0 ? (
             <p className="mastery-done">今日 {digest.items.length} 条已全部掌握</p>
+          ) : null}
+          {category === "全部" && unmarkedItems.length === 0 && unmasteredItems.length > 0 ? (
+            <p className="mastery-done mastery-done--review">
+              今日内容已全部处理，还有 {unmasteredItems.length} 条待复习
+            </p>
           ) : null}
           <div className="stack">
             {items.map((item, index) => (

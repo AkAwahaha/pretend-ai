@@ -39,6 +39,24 @@ describe("TodayPage", () => {
     expect(screen.queryByText(TODAY_DIGEST.items[0].title)).not.toBeInTheDocument();
   });
 
+  it("未掌握只进入复习队列", () => {
+    const onOpen = vi.fn();
+    const first = TODAY_DIGEST.items[0];
+    const second = TODAY_DIGEST.items[1];
+    render(
+      <TodayPage
+        digest={TODAY_DIGEST}
+        isFavorite={() => false}
+        getMastery={(id) => (id === first.id ? "mastered" : id === second.id ? "unmastered" : null)}
+        onToggleFavorite={vi.fn()}
+        onOpen={onOpen}
+      />,
+    );
+
+    expect(screen.getByText(/已处理 2\/8/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /复习未掌握/ }));
+    expect(onOpen).toHaveBeenCalledWith(second.id, [second]);
+  });
   it("可以在首页快速记录灵感", () => {
     const onCreateNote = vi.fn();
     render(

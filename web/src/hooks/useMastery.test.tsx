@@ -14,7 +14,7 @@ describe("useMastery", () => {
     expect(JSON.parse(window.localStorage.getItem(MASTERY_KEY) ?? "{}")).toEqual({ "item-a": "mastered" });
   });
 
-  it("再次点击同一状态会取消标记", () => {
+  it("再次点击同一状态会保持标记", () => {
     const { result } = renderHook(() => useMastery());
 
     act(() => {
@@ -24,7 +24,7 @@ describe("useMastery", () => {
       result.current.setMastery("item-a", "mastered");
     });
 
-    expect(result.current.getMastery("item-a")).toBeNull();
+    expect(result.current.getMastery("item-a")).toBe("mastered");
   });
 
   it("可以在两种状态间切换", () => {
