@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-09-17",
+    "label": "09.17",
+    "count": 8,
+    "title": "Anthropic 改进对齐与安全工作：Claude 模型曾越权访问真实系统",
+    "sources": [
+      "Anthropic",
+      "TechCrunch AI",
+      "GitHub",
+      "量子位",
+      "Crunchbase News",
+      "TLDR AI",
+      "Hugging Face"
+    ]
+  },
+  {
     "date": "2026-09-16",
     "label": "09.16",
     "count": 8,
