@@ -6,18 +6,20 @@
 
 线上地址：https://akawahaha.github.io/pretend-ai/
 
+> 当前状态：自动抓取与自动部署已暂停，线上静态页面继续保留。
+
 ## 它做什么
 
 - 从 8 个信息源抓取当天内容：OpenAI、Anthropic、Google DeepMind、TLDR AI、Menlo Ventures、GitHub、Hugging Face、arXiv
 - 清洗去重，并按已发布索引过滤，优先只推新内容
 - 按来源轮询选取，保证来源多样性：3 条精读 + 5 条速览
 - 调用大模型生成中文结构化卡片（标题、概述、亮点思路、产品视角）
-- 每天自动生成并部署，手机浏览器打开即用，电脑关机不影响
+- 此前支持每天自动生成并部署；当前自动任务已暂停，页面和数据保留
 
 ## 架构
 
 ```
-GitHub Actions（每小时尝试，当天日报已存在则跳过）
+GitHub Actions（历史自动流程，现已停用）
    │
    ├─ 1. 抓取 8 个信息源（单个失败自动跳过）
    ├─ 2. 清洗去重 + 已发布过滤（pipeline/data/seen.json）
@@ -46,7 +48,7 @@ GitHub Actions（每小时尝试，当天日报已存在则跳过）
 ├── web/                      # 前端：移动端日报
 │   ├── src/                  # 组件、页面、hooks
 │   └── public/data/          # 生成的日报 JSON 与历史归档
-├── .github/workflows/        # 每日自动生成与部署
+├── .github/workflows-disabled/ # 已停用的自动生成与部署配置
 ├── agent.md                  # 协作规则
 └── package.json              # 统一命令入口
 ```
@@ -79,7 +81,7 @@ npm run build
 
 ## 部署
 
-推送到 `master` 后由 GitHub Actions 自动处理：
+自动抓取和部署已停用，线上页面保持当前版本。原工作流配置保留在 `.github/workflows-disabled/`，需要恢复时可重新启用。
 
 - 定时：每小时尝试一次，当天日报已存在则跳过
 - 手动：Actions → Daily Digest → Run workflow，可勾选 `force` 强制重新生成
